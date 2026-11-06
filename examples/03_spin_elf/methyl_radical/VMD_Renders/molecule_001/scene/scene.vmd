@@ -268,8 +268,8 @@ atomselect macro drude {type DRUD or type LP}
 # Display settings
 display eyesep       0.065000
 display focallength  2.000000
-display height       10.000000
-display distance     -8.000000
+display height       6.000000
+display distance     -2.000000
 display projection   Perspective
 display nearclip set 0.010000
 display farclip  set 100000.000000
@@ -394,7 +394,7 @@ mol clipplane color  5 2 top {0.5 0.5 0.5 }
 mol clipplane normal 5 2 top {0.0 0.0 1.0}
 mol clipplane status 5 2 top {0}
 mol rename top molecule.psf
-set viewpoints([molinfo top]) {{{1 0 0 5.96046e-08} {0 1 0 -0.000249952} {0 0 1 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}} {{0.793634 0 0 0} {0 0.793634 0 0} {0 0 0.793634 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+set viewpoints([molinfo top]) {{{1 0 0 1.4549e-18} {0 1 0 -0.00025} {0 0 1 1.65436e-24} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}} {{0.560704 0 0 0} {0 0.560704 0 0} {0 0 0.560704 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
 lappend viewplist [molinfo top]
 set topmol [molinfo top]
 # done with molecule 0

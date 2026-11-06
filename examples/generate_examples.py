@@ -209,7 +209,7 @@ def render(folder, mol, overrides):
             project, timeout=1800)
     files, _ = vmd.save_converted_images(
         tga, project / "output", "render", "png", False, (255, 255, 255))
-    return next(f for f in files if f.endswith(".png"))
+    return next(f for f in files if f.endswith(".png")), project
 
 
 def gallery_copy(png, folder, name):
@@ -222,6 +222,7 @@ def gallery_copy(png, folder, name):
 # ------------------------------------------------------------- the examples
 def example_orbital(folder, name, charge, mult, geometry):
     folder.mkdir(parents=True, exist_ok=True)
+    kept = []
     inp = write_inp(folder, name, charge, mult, geometry)
     print(f"  ORCA {name} ...")
     orca_run(folder, inp.name)
@@ -233,14 +234,15 @@ def example_orbital(folder, name, charge, mult, geometry):
         cube = cube_from_orca_plot(stem.with_suffix(".gbw"), folder,
                                    "mo", mo=mo)
         cube.rename(folder / f"{label}.cube")
-        png = render(folder, mol, {
+        png, project = render(folder, mol, {
             "preset": "custom",
             "cube": {"enabled": True,
                      "path": str(folder / f"{label}.cube"),
                      "iso_pos": 0.05, "iso_neg": -0.05},
         })
         images.append(gallery_copy(png, folder, f"render_{label}"))
-    return images
+        kept.append(project)
+    return images, kept
 
 
 def example_mep(folder, name, charge, mult, geometry, esp_span=None,
@@ -256,7 +258,7 @@ def example_mep(folder, name, charge, mult, geometry, esp_span=None,
     esp = cube_from_multiwfn(molden, folder, "esp")
     esp.rename(folder / "esp.cube")
     mol = mol_from_xyz(folder / f"{name}.xyz", charge)
-    png = render(folder, mol, {
+    png, _project = render(folder, mol, {
         "preset": "custom",
         "camera": "custom", "custom_rot": list(view),
         "fit_margin": 1.55,
@@ -268,7 +270,7 @@ def example_mep(folder, name, charge, mult, geometry, esp_span=None,
                  "map_high": esp_high if esp_high is not None else esp_span,
                  "map_range_set": True},
     })
-    return [gallery_copy(png, folder, "render_mep")]
+    return [gallery_copy(png, folder, "render_mep")], [_project]
 
 
 def example_spin(folder, name, charge, mult, geometry):
@@ -280,13 +282,13 @@ def example_spin(folder, name, charge, mult, geometry):
     spin = cube_from_orca_plot(stem.with_suffix(".gbw"), folder, "spin")
     spin.rename(folder / "spindens.cube")
     mol = mol_from_xyz(folder / f"{name}.xyz", charge)
-    png = render(folder, mol, {
+    png, _project = render(folder, mol, {
         "preset": "custom",
         "cube": {"enabled": True,
                  "path": str(folder / "spindens.cube"),
                  "iso_pos": 0.002, "iso_neg": -0.002},
     })
-    return [gallery_copy(png, folder, "render_spin")]
+    return [gallery_copy(png, folder, "render_spin")], [_project]
 
 
 def example_elf(folder, name, charge, mult, geometry):
@@ -299,13 +301,13 @@ def example_elf(folder, name, charge, mult, geometry):
     elf = cube_from_multiwfn(molden, folder, "elf")
     elf.rename(folder / "elf.cube")
     mol = mol_from_xyz(folder / f"{name}.xyz", charge)
-    png = render(folder, mol, {
+    png, _project = render(folder, mol, {
         "preset": "custom",
         "cube": {"enabled": True, "path": str(folder / "elf.cube"),
                  "iso_pos": 0.8,          # localization domains
                  "opacity": 0.55},        # molecule visible inside
     })
-    return [gallery_copy(png, folder, "render_elf")]
+    return [gallery_copy(png, folder, "render_elf")], [_project]
 
 
 GEOMETRIES = {
@@ -349,16 +351,22 @@ GEOMETRIES = {
 }
 
 
-def prune_for_repo():
+def prune_for_repo(keep):
     """Strip regenerable bulk so the gallery stays repository-friendly.
 
-    Removed: cubes duplicated inside each render project (the originals
-    stay at the example top level), the 15 MB Tachyon scene dumps, the
-    native .tga (a lossless .png copy is kept) and the molden files
-    (one orca_2mkl command brings them back, see the README).
+    Removed: render projects from PREVIOUS runs (only the projects of
+    the run that just finished are kept), cubes duplicated inside each
+    render project (the originals stay at the example top level), the
+    15 MB Tachyon scene dumps, the native .tga (a lossless .png copy is
+    kept) and the molden files (one orca_2mkl command brings them
+    back, see the README).
     """
+    keep = set(str(p) for p in keep)
     for folder in HERE.glob("0*_*/*"):
         for project in (folder / "VMD_Renders").glob("molecule_*"):
+            if str(project) not in keep:
+                shutil.rmtree(project, ignore_errors=True)
+                continue
             for cube in (project / "volumetric").glob("*"):
                 cube.unlink()
             dat = project / "tachyon" / "scene.dat"
@@ -389,12 +397,17 @@ def main():
         ("03_spin_elf/methyl_radical", example_spin, "methyl_radical", {}),
         ("03_spin_elf/water_elf", example_elf, "water", {}),
     ]
+    kept_projects = []
     for relative, builder, molecule, extra in jobs:
         folder = HERE / relative
         print(f"[{relative}]")
+        # deterministic numbering: every run starts fresh at molecule_001
+        shutil.rmtree(folder / "VMD_Renders", ignore_errors=True)
         charge, mult, geometry = GEOMETRIES[molecule]
-        builder(folder, molecule, charge, mult, geometry, **extra)
-    prune_for_repo()
+        _images, kept = builder(folder, molecule, charge, mult,
+                                geometry, **extra)
+        kept_projects.extend(kept)
+    prune_for_repo(kept_projects)
     print("all examples done (pruned for the repository)")
 
 

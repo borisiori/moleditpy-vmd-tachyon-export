@@ -66,9 +66,11 @@ mol material Glossy
 mol addrep $mol
 
 # --- camera (center/rotate/scale; see README) ---
-display resetview
-display distance -8.0
-display height 10
+foreach _m [molinfo list] {
+  molinfo $_m set rotate_matrix {{ {1.0 0.0 0.0 0.0} {0.0 1.0 0.0 0.0} {0.0 0.0 1.0 0.0} {0.0 0.0 0.0 1.0} }}
+  molinfo $_m set scale_matrix {{ {0.4934647245074909 0.0 0.0 0.0} {0.0 0.4934647245074909 0.0 0.0} {0.0 0.0 0.4934647245074909 0.0} {0.0 0.0 0.0 1.0} }}
+  molinfo $_m set center_matrix {{ {1.0 0.0 0.0 2.4426171995741752e-18} {0.0 1.0 0.0 -0.0} {0.0 0.0 1.0 -0.02750000000000003} {0.0 0.0 0.0 1.0} }}
+}
 display projection Perspective
 display nearclip set 0.01
 display farclip set 100000.0

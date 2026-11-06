@@ -38,8 +38,8 @@
   "background": "white",
   "bg_color": "#ffffff",
   "projection": "Perspective",
-  "width": 1200,
-  "height": 1000,
+  "width": 1400,
+  "height": 1160,
   "format": "png",
   "aasamples": 24,
   "transparent": false,
@@ -69,5 +69,6 @@
   },
   "output_root": "/home/borisiori/.moleditpy/vmd_tachyon_export_project/examples/02_mep/chloromethane/VMD_Renders",
   "project_name": "",
+  "fit_margin": 1.55,
   "_natoms": 5
 }

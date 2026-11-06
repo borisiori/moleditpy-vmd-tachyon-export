@@ -1,6 +1,6 @@
 {
-  "generator": "VMD-Tachyon Export v0.1.0",
-  "created": "2026-11-04 22:11:07",
+  "generator": "VMD-Tachyon Export v2026.11.04",
+  "created": "2026-11-05 21:18:39",
   "molecule": "molecule",
   "natoms": 4,
   "vmd": {
@@ -10,13 +10,13 @@
   },
   "engine": "tachyon",
   "engine_reason": "external Tachyon (exact resolution)",
-  "render_command": "/home/borisiori/Programas/VMD/lib/vmd/tachyon_LINUXAMD64 tachyon/scene.dat -o output/render.tga -res 1200 1000 -aasamples 24 -trans_raster3d -fullshade",
+  "render_command": "/home/borisiori/Programas/VMD/lib/vmd/tachyon_LINUXAMD64 tachyon/scene.dat -o output/render.tga -res 1400 1160 -aasamples 24 -trans_raster3d -fullshade",
   "resolution": [
-    1200,
-    1000
+    1400,
+    1160
   ],
   "format": "png",
-  "camera": "auto_fit",
+  "camera": "custom",
   "match_moleditpy_orientation": false,
   "preset": "custom",
   "files": {

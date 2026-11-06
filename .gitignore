@@ -16,7 +16,5 @@ vmdprobe_*
 /tmp/
 *.log.tmp
 
-# Local re-runs of the examples append new numbered render projects;
-# the committed state ships exactly one (molecule_001) per example.
-examples/*/*/VMD_Renders/molecule_0[2-9]*
-examples/*/*/VMD_Renders/molecule_[1-9][0-9]*
+# The examples generator prunes old render projects itself; nothing
+# example-related is ignored on purpose (the gallery ships complete).
