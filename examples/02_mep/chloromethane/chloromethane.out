@@ -171,9 +171,9 @@ interface, adapt or use parts of their codes:
 
 
   ***********************************
-  * Starting time: Wed Nov  4 22:11:57 2026
+  * Starting time: Thu Nov  5 20:52:31 2026
   * Host name:     borisiori
-  * Process ID:    1595710
+  * Process ID:    1785395
   * Working dir.:  /home/borisiori/.moleditpy/vmd_tachyon_export_project/examples/02_mep/chloromethane
   ***********************************
 
@@ -193,6 +193,10 @@ Your calculation utilizes the auxiliary basis: def2/J
                                         WARNINGS
                        Please study these warnings very carefully!
 ================================================================================
+
+WARNING: Old DensityContainer found on disk!
+         Will remove this file - 
+         If you want to keep old densities, please start your calculation with a different basename. 
 
 
 WARNING: Geometry Optimization
@@ -512,7 +516,7 @@ UseSFitting                                  ... on
 Grids setup in   0.1 sec
 Initializing property integral containers    ... done (  0.0 sec)
 
-SHARK setup successfully completed in   0.1 seconds
+SHARK setup successfully completed in   0.2 seconds
 
 Maximum memory used throughout the entire STARTUP-calculation: 9.2 MB
 
@@ -663,15 +667,15 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     DIISErr   Damp
 -------------------------------------------------------------------------------------------
                ***  Starting incremental Fock matrix formation  ***
     1    -499.8164645439380820     0.00e+00  7.68e-03  5.79e-02  1.22e-01  0.700   0.1
-    2    -499.8307578825938435    -1.43e-02  5.51e-03  3.53e-02  6.32e-02  0.700   0.0
+    2    -499.8307578825938435    -1.43e-02  5.51e-03  3.53e-02  6.32e-02  0.700   0.1
                                ***Turning on AO-DIIS***
-    3    -499.8369072758230232    -6.15e-03  2.54e-03  1.56e-02  2.37e-02  0.700   0.0
-    4    -499.8405249580491727    -3.62e-03  4.57e-03  2.76e-02  1.30e-02  0.000   0.0
+    3    -499.8369072758230232    -6.15e-03  2.54e-03  1.56e-02  2.37e-02  0.700   0.1
+    4    -499.8405249580491727    -3.62e-03  4.57e-03  2.76e-02  1.30e-02  0.000   0.1
                               *** Initializing SOSCF ***
 ---------------------------------------S-O-S-C-F--------------------------------------
 Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Time(sec)
 --------------------------------------------------------------------------------------
-    5    -499.8483067576613621    -7.78e-03  6.86e-04  4.81e-03  2.29e-03     0.0
+    5    -499.8483067576613621    -7.78e-03  6.86e-04  4.81e-03  2.29e-03     0.1
                *** Restarting incremental Fock matrix formation ***
     6    -499.8483108021421231    -4.04e-06  3.19e-04  1.40e-03  4.86e-04     0.1
     7    -499.8483094608635611     1.34e-06  1.62e-04  1.08e-03  5.55e-04     0.1
@@ -684,7 +688,7 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Tim
                *           SCF CONVERGED AFTER   9 CYCLES          *
                *****************************************************
 
-Recomputing exchange energy using gridx3       ... done (    0.066 sec)
+Recomputing exchange energy using gridx3       ... done (    0.077 sec)
 Old exchange energy                            :     -6.753718780 Eh
 New exchange energy                            :     -6.753713678 Eh
 Exchange energy change after final integration :      0.000005102 Eh
@@ -894,28 +898,29 @@ TIMINGS
 
 Total SCF time: 0 days 0 hours 0 min 1 sec 
 
-Total time                  ....       1.693 sec
-Sum of individual times     ....       1.636 sec  ( 96.7%)
+Total time                  ....       1.873 sec
+Sum of individual times     ....       1.786 sec  ( 95.3%)
 
-SCF preparation             ....       1.069 sec  ( 63.1%)
-Fock matrix formation       ....       0.533 sec  ( 31.5%)
-  Startup                   ....       0.001 sec  (  0.1% of F)
-  Split-RI-J                ....       0.029 sec  (  5.5% of F)
-  Chain of spheres X        ....       0.392 sec  ( 73.6% of F)
-  XC integration            ....       0.118 sec  ( 22.2% of F)
-    Basis function eval.    ....       0.038 sec  ( 31.8% of XC)
-    Density eval.           ....       0.016 sec  ( 13.3% of XC)
-    XC-Functional eval.     ....       0.017 sec  ( 14.3% of XC)
-    XC-Potential eval.      ....       0.020 sec  ( 16.8% of XC)
+SCF preparation             ....       1.096 sec  ( 58.5%)
+Fock matrix formation       ....       0.650 sec  ( 34.7%)
+  Startup                   ....       0.002 sec  (  0.3% of F)
+  Split-RI-J                ....       0.059 sec  (  9.1% of F)
+  Chain of spheres X        ....       0.453 sec  ( 69.7% of F)
+  XC integration            ....       0.155 sec  ( 23.8% of F)
+    XC Preparation          ....       0.000 sec  (  0.0% of XC)
+    Basis function eval.    ....       0.040 sec  ( 25.8% of XC)
+    Density eval.           ....       0.015 sec  (  9.7% of XC)
+    XC-Functional eval.     ....       0.018 sec  ( 11.3% of XC)
+    XC-Potential eval.      ....       0.021 sec  ( 13.9% of XC)
 Diagonalization             ....       0.000 sec  (  0.0%)
-Density matrix formation    ....       0.003 sec  (  0.2%)
-Total Energy calculation    ....       0.005 sec  (  0.3%)
-Population analysis         ....       0.002 sec  (  0.1%)
-Orbital Transformation      ....       0.002 sec  (  0.1%)
+Density matrix formation    ....       0.005 sec  (  0.3%)
+Total Energy calculation    ....       0.004 sec  (  0.2%)
+Population analysis         ....       0.003 sec  (  0.2%)
+Orbital Transformation      ....       0.004 sec  (  0.2%)
 Orbital Orthonormalization  ....       0.000 sec  (  0.0%)
-DIIS solution               ....       0.008 sec  (  0.5%)
-SOSCF solution              ....       0.015 sec  (  0.9%)
-Finished LeanSCF after   1.7 sec
+DIIS solution               ....       0.013 sec  (  0.7%)
+SOSCF solution              ....       0.010 sec  (  0.5%)
+Finished LeanSCF after   1.9 sec
 
 Maximum memory used throughout the entire LEANSCF-calculation: 5.5 MB
 
@@ -937,7 +942,7 @@ Nuc. rep. gradient        (SHARK) ... done (  0.0 sec)
 HCore & Overlap gradient  (SHARK) ... done (  0.0 sec)
 Split-RIJ-J gradient      (SHARK) ... done (  0.1 sec)
 COSX-gradient                     ... done (  0.3 sec)
-XC gradient                       ... done (  0.1 sec)
+XC gradient                       ... done (  0.0 sec)
 
 ------------------
 CARTESIAN GRADIENT
@@ -963,13 +968,13 @@ MAX gradient                       ...    0.0132569748
 TIMINGS
 -------
 
-Total SCF gradient time     ....        0.422 sec
+Total SCF gradient time     ....        0.439 sec
 
 Densities                   ....       0.000 sec  (  0.0%)
-One electron gradient       ....       0.003 sec  (  0.7%)
-RI-J Coulomb gradient       ....       0.055 sec  ( 13.1%)
-COSX gradient               ....       0.313 sec  ( 74.2%)
-XC gradient                 ....       0.051 sec  ( 12.0%)
+One electron gradient       ....       0.007 sec  (  1.6%)
+RI-J Coulomb gradient       ....       0.055 sec  ( 12.5%)
+COSX gradient               ....       0.328 sec  ( 74.8%)
+XC gradient                 ....       0.049 sec  ( 11.1%)
 
 Maximum memory used throughout the entire SCFGRAD-calculation: 7.2 MB
 ------------------------------------------------------------------------------
@@ -1043,19 +1048,19 @@ The optimization has not yet converged - more geometry cycles are needed
     ----------------------------------------------------------------------------
 
 Geometry step timings:
-Preparation and reading OPT file:      0.000 s ( 4.294 %)
-Internal coordinates            :      0.000 s ( 3.681 %)
-B/P matrices and projection     :      0.000 s (22.699 %)
-Hessian update/contruction      :      0.000 s (17.485 %)
-Making the step                 :      0.000 s (16.871 %)
-Converting the step to Cartesian:      0.000 s ( 5.828 %)
-Storing new data                :      0.000 s ( 4.294 %)
-Checking convergence            :      0.000 s ( 4.601 %)
-Final printing                  :      0.000 s (20.245 %)
-Total time                      :      0.000 s
+Preparation and reading OPT file:      0.000 s ( 4.186 %)
+Internal coordinates            :      0.000 s ( 2.950 %)
+B/P matrices and projection     :      0.000 s (20.647 %)
+Hessian update/contruction      :      0.000 s (14.748 %)
+Making the step                 :      0.000 s (24.072 %)
+Converting the step to Cartesian:      0.000 s ( 5.709 %)
+Storing new data                :      0.000 s ( 3.996 %)
+Checking convergence            :      0.000 s ( 4.091 %)
+Final printing                  :      0.000 s (19.600 %)
+Total time                      :      0.001 s
 
-Time for energy+gradient        :      6.639 s
-Time for complete geometry iter :      7.964 s
+Time for energy+gradient        :      6.985 s
+Time for complete geometry iter :      8.355 s
 
          *************************************************************
          *                GEOMETRY OPTIMIZATION CYCLE   2            *
@@ -1183,7 +1188,7 @@ Time for diagonalization                   ...    0.000 sec
 Threshold for overlap eigenvalues          ... 1.000e-07
 Number of eigenvalues below threshold      ... 0
 Time for construction of square roots      ...    0.000 sec
-Total time needed                          ...    0.000 sec
+Total time needed                          ...    0.002 sec
 
 -------------------
 DFT GRID GENERATION
@@ -1265,10 +1270,10 @@ Total number of batches                      ...      116
 Average number of points per batch           ...      123
 Average number of grid points per atom       ...     2873
 UseSFitting                                  ... on
-Grids setup in   0.1 sec
+Grids setup in   0.2 sec
 Initializing property integral containers    ... done (  0.0 sec)
 
-SHARK setup successfully completed in   0.1 seconds
+SHARK setup successfully completed in   0.2 seconds
 
 Maximum memory used throughout the entire STARTUP-calculation: 9.2 MB
 
@@ -1307,7 +1312,7 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Tim
                *           SCF CONVERGED AFTER   4 CYCLES          *
                *****************************************************
 
-Recomputing exchange energy using gridx3       ... done (    0.074 sec)
+Recomputing exchange energy using gridx3       ... done (    0.077 sec)
 Old exchange energy                            :     -6.754174510 Eh
 New exchange energy                            :     -6.754183760 Eh
 Exchange energy change after final integration :     -0.000009250 Eh
@@ -1352,7 +1357,7 @@ SCF CONVERGENCE
 
 
 Total SCF time: 0 days 0 hours 0 min 1 sec 
-Finished LeanSCF after   1.5 sec
+Finished LeanSCF after   1.6 sec
 
 Maximum memory used throughout the entire LEANSCF-calculation: 5.6 MB
 
@@ -1373,8 +1378,8 @@ FINAL SINGLE POINT ENERGY      -499.848545467205
 Nuc. rep. gradient        (SHARK) ... done (  0.0 sec)
 HCore & Overlap gradient  (SHARK) ... done (  0.0 sec)
 Split-RIJ-J gradient      (SHARK) ... done (  0.1 sec)
-COSX-gradient                     ... done (  0.3 sec)
-XC gradient                       ... done (  0.0 sec)
+COSX-gradient                     ... done (  0.4 sec)
+XC gradient                       ... done (  0.1 sec)
 
 ------------------
 CARTESIAN GRADIENT
@@ -1400,13 +1405,13 @@ MAX gradient                       ...    0.0086107639
 TIMINGS
 -------
 
-Total SCF gradient time     ....        0.421 sec
+Total SCF gradient time     ....        0.464 sec
 
 Densities                   ....       0.000 sec  (  0.0%)
-One electron gradient       ....       0.003 sec  (  0.7%)
-RI-J Coulomb gradient       ....       0.056 sec  ( 13.3%)
-COSX gradient               ....       0.317 sec  ( 75.2%)
-XC gradient                 ....       0.045 sec  ( 10.8%)
+One electron gradient       ....       0.006 sec  (  1.4%)
+RI-J Coulomb gradient       ....       0.053 sec  ( 11.5%)
+COSX gradient               ....       0.352 sec  ( 75.7%)
+XC gradient                 ....       0.053 sec  ( 11.3%)
 
 Maximum memory used throughout the entire SCFGRAD-calculation: 7.2 MB
 ------------------------------------------------------------------------------
@@ -1485,19 +1490,19 @@ The optimization has not yet converged - more geometry cycles are needed
     ----------------------------------------------------------------------------
 
 Geometry step timings:
-Preparation and reading OPT file:      0.000 s ( 2.907 %)
-Internal coordinates            :      0.000 s ( 2.907 %)
-B/P matrices and projection     :      0.000 s (19.186 %)
-Hessian update/contruction      :      0.000 s (38.081 %)
-Making the step                 :      0.000 s ( 9.302 %)
-Converting the step to Cartesian:      0.000 s ( 3.488 %)
-Storing new data                :      0.000 s ( 3.779 %)
-Checking convergence            :      0.000 s ( 5.814 %)
-Final printing                  :      0.000 s (14.244 %)
-Total time                      :      0.000 s
+Preparation and reading OPT file:      0.000 s ( 4.174 %)
+Internal coordinates            :      0.000 s ( 2.609 %)
+B/P matrices and projection     :      0.000 s (20.348 %)
+Hessian update/contruction      :      0.000 s (41.739 %)
+Making the step                 :      0.000 s ( 8.522 %)
+Converting the step to Cartesian:      0.000 s ( 4.174 %)
+Storing new data                :      0.000 s ( 4.000 %)
+Checking convergence            :      0.000 s ( 4.174 %)
+Final printing                  :      0.000 s (10.261 %)
+Total time                      :      0.001 s
 
-Time for energy+gradient        :      6.366 s
-Time for complete geometry iter :      7.704 s
+Time for energy+gradient        :      6.801 s
+Time for complete geometry iter :      8.164 s
 
          *************************************************************
          *                GEOMETRY OPTIMIZATION CYCLE   3            *
@@ -1710,7 +1715,7 @@ UseSFitting                                  ... on
 Grids setup in   0.1 sec
 Initializing property integral containers    ... done (  0.0 sec)
 
-SHARK setup successfully completed in   0.1 seconds
+SHARK setup successfully completed in   0.2 seconds
 
 Maximum memory used throughout the entire STARTUP-calculation: 9.2 MB
 
@@ -1752,7 +1757,7 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Tim
                *           SCF CONVERGED AFTER   7 CYCLES          *
                *****************************************************
 
-Recomputing exchange energy using gridx3       ... done (    0.076 sec)
+Recomputing exchange energy using gridx3       ... done (    0.077 sec)
 Old exchange energy                            :     -6.754103156 Eh
 New exchange energy                            :     -6.754105824 Eh
 Exchange energy change after final integration :     -0.000002668 Eh
@@ -1797,7 +1802,7 @@ SCF CONVERGENCE
 
 
 Total SCF time: 0 days 0 hours 0 min 1 sec 
-Finished LeanSCF after   1.6 sec
+Finished LeanSCF after   1.7 sec
 
 Maximum memory used throughout the entire LEANSCF-calculation: 5.6 MB
 
@@ -1819,7 +1824,7 @@ Nuc. rep. gradient        (SHARK) ... done (  0.0 sec)
 HCore & Overlap gradient  (SHARK) ... done (  0.0 sec)
 Split-RIJ-J gradient      (SHARK) ... done (  0.1 sec)
 COSX-gradient                     ... done (  0.3 sec)
-XC gradient                       ... done (  0.0 sec)
+XC gradient                       ... done (  0.1 sec)
 
 ------------------
 CARTESIAN GRADIENT
@@ -1845,13 +1850,13 @@ MAX gradient                       ...    0.0010882485
 TIMINGS
 -------
 
-Total SCF gradient time     ....        0.415 sec
+Total SCF gradient time     ....        0.454 sec
 
 Densities                   ....       0.000 sec  (  0.0%)
-One electron gradient       ....       0.003 sec  (  0.7%)
-RI-J Coulomb gradient       ....       0.056 sec  ( 13.5%)
-COSX gradient               ....       0.311 sec  ( 74.9%)
-XC gradient                 ....       0.045 sec  ( 10.8%)
+One electron gradient       ....       0.007 sec  (  1.5%)
+RI-J Coulomb gradient       ....       0.055 sec  ( 12.2%)
+COSX gradient               ....       0.341 sec  ( 75.2%)
+XC gradient                 ....       0.050 sec  ( 11.1%)
 
 Maximum memory used throughout the entire SCFGRAD-calculation: 7.2 MB
 ------------------------------------------------------------------------------
@@ -1930,19 +1935,19 @@ The optimization has not yet converged - more geometry cycles are needed
     ----------------------------------------------------------------------------
 
 Geometry step timings:
-Preparation and reading OPT file:      0.000 s ( 3.325 %)
-Internal coordinates            :      0.000 s ( 3.581 %)
-B/P matrices and projection     :      0.000 s (19.182 %)
-Hessian update/contruction      :      0.000 s (28.389 %)
-Making the step                 :      0.000 s (10.742 %)
-Converting the step to Cartesian:      0.000 s ( 4.092 %)
-Storing new data                :      0.000 s ( 3.581 %)
-Checking convergence            :      0.000 s ( 9.207 %)
-Final printing                  :      0.000 s (17.903 %)
-Total time                      :      0.000 s
+Preparation and reading OPT file:      0.000 s ( 3.718 %)
+Internal coordinates            :      0.000 s ( 2.935 %)
+B/P matrices and projection     :      0.000 s (15.753 %)
+Hessian update/contruction      :      0.000 s (42.857 %)
+Making the step                 :      0.000 s ( 9.295 %)
+Converting the step to Cartesian:      0.000 s ( 4.403 %)
+Storing new data                :      0.000 s ( 4.403 %)
+Checking convergence            :      0.000 s ( 5.969 %)
+Final printing                  :      0.000 s (10.568 %)
+Total time                      :      0.001 s
 
-Time for energy+gradient        :      6.472 s
-Time for complete geometry iter :      7.802 s
+Time for energy+gradient        :      6.817 s
+Time for complete geometry iter :      8.179 s
 
          *************************************************************
          *                GEOMETRY OPTIMIZATION CYCLE   4            *
@@ -2070,7 +2075,7 @@ Time for diagonalization                   ...    0.000 sec
 Threshold for overlap eigenvalues          ... 1.000e-07
 Number of eigenvalues below threshold      ... 0
 Time for construction of square roots      ...    0.000 sec
-Total time needed                          ...    0.001 sec
+Total time needed                          ...    0.002 sec
 
 -------------------
 DFT GRID GENERATION
@@ -2155,7 +2160,7 @@ UseSFitting                                  ... on
 Grids setup in   0.1 sec
 Initializing property integral containers    ... done (  0.0 sec)
 
-SHARK setup successfully completed in   0.1 seconds
+SHARK setup successfully completed in   0.2 seconds
 
 Maximum memory used throughout the entire STARTUP-calculation: 9.2 MB
 
@@ -2166,7 +2171,7 @@ Maximum memory used throughout the entire STARTUP-calculation: 9.2 MB
            ************************************************************
 Occupation numbers will be reassigned to an Aufbau configuration
              **** ENERGY FILE WAS UPDATED (chloromethane.en.tmp) ****
-Finished Guess after   1.1 sec
+Finished Guess after   1.2 sec
 Maximum memory used throughout the entire GUESS-calculation: 5.8 MB
 
 
@@ -2193,7 +2198,7 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Tim
                *           SCF CONVERGED AFTER   3 CYCLES          *
                *****************************************************
 
-Recomputing exchange energy using gridx3       ... done (    0.071 sec)
+Recomputing exchange energy using gridx3       ... done (    0.078 sec)
 Old exchange energy                            :     -6.753938530 Eh
 New exchange energy                            :     -6.753945887 Eh
 Exchange energy change after final integration :     -0.000007357 Eh
@@ -2238,7 +2243,7 @@ SCF CONVERGENCE
 
 
 Total SCF time: 0 days 0 hours 0 min 1 sec 
-Finished LeanSCF after   1.4 sec
+Finished LeanSCF after   1.5 sec
 
 Maximum memory used throughout the entire LEANSCF-calculation: 5.6 MB
 
@@ -2286,13 +2291,13 @@ MAX gradient                       ...    0.0003368611
 TIMINGS
 -------
 
-Total SCF gradient time     ....        0.432 sec
+Total SCF gradient time     ....        0.416 sec
 
 Densities                   ....       0.000 sec  (  0.0%)
-One electron gradient       ....       0.003 sec  (  0.6%)
-RI-J Coulomb gradient       ....       0.055 sec  ( 12.8%)
-COSX gradient               ....       0.333 sec  ( 77.1%)
-XC gradient                 ....       0.041 sec  (  9.4%)
+One electron gradient       ....       0.006 sec  (  1.4%)
+RI-J Coulomb gradient       ....       0.051 sec  ( 12.2%)
+COSX gradient               ....       0.311 sec  ( 74.6%)
+XC gradient                 ....       0.049 sec  ( 11.8%)
 
 Maximum memory used throughout the entire SCFGRAD-calculation: 7.2 MB
 ------------------------------------------------------------------------------
@@ -2371,19 +2376,19 @@ The optimization has not yet converged - more geometry cycles are needed
     ----------------------------------------------------------------------------
 
 Geometry step timings:
-Preparation and reading OPT file:      0.000 s ( 3.234 %)
-Internal coordinates            :      0.000 s ( 3.483 %)
-B/P matrices and projection     :      0.000 s (17.910 %)
-Hessian update/contruction      :      0.000 s (33.333 %)
-Making the step                 :      0.000 s (11.443 %)
-Converting the step to Cartesian:      0.000 s ( 3.731 %)
-Storing new data                :      0.000 s ( 3.731 %)
-Checking convergence            :      0.000 s ( 6.965 %)
-Final printing                  :      0.000 s (16.169 %)
-Total time                      :      0.000 s
+Preparation and reading OPT file:      0.000 s ( 3.914 %)
+Internal coordinates            :      0.000 s ( 2.429 %)
+B/P matrices and projection     :      0.000 s (18.623 %)
+Hessian update/contruction      :      0.000 s (39.136 %)
+Making the step                 :      0.000 s (10.121 %)
+Converting the step to Cartesian:      0.000 s ( 3.779 %)
+Storing new data                :      0.000 s ( 4.049 %)
+Checking convergence            :      0.000 s ( 4.049 %)
+Final printing                  :      0.000 s (13.765 %)
+Total time                      :      0.001 s
 
-Time for energy+gradient        :      6.266 s
-Time for complete geometry iter :      7.584 s
+Time for energy+gradient        :      6.615 s
+Time for complete geometry iter :      7.963 s
 
          *************************************************************
          *                GEOMETRY OPTIMIZATION CYCLE   5            *
@@ -2634,7 +2639,7 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Tim
                *           SCF CONVERGED AFTER   3 CYCLES          *
                *****************************************************
 
-Recomputing exchange energy using gridx3       ... done (    0.074 sec)
+Recomputing exchange energy using gridx3       ... done (    0.076 sec)
 Old exchange energy                            :     -6.753860856 Eh
 New exchange energy                            :     -6.753864551 Eh
 Exchange energy change after final integration :     -0.000003696 Eh
@@ -2727,13 +2732,13 @@ MAX gradient                       ...    0.0000072652
 TIMINGS
 -------
 
-Total SCF gradient time     ....        0.388 sec
+Total SCF gradient time     ....        0.441 sec
 
 Densities                   ....       0.000 sec  (  0.0%)
-One electron gradient       ....       0.003 sec  (  0.9%)
-RI-J Coulomb gradient       ....       0.051 sec  ( 13.2%)
-COSX gradient               ....       0.292 sec  ( 75.1%)
-XC gradient                 ....       0.042 sec  ( 10.8%)
+One electron gradient       ....       0.005 sec  (  1.1%)
+RI-J Coulomb gradient       ....       0.057 sec  ( 12.8%)
+COSX gradient               ....       0.331 sec  ( 75.0%)
+XC gradient                 ....       0.049 sec  ( 11.0%)
 
 Maximum memory used throughout the entire SCFGRAD-calculation: 7.2 MB
 ------------------------------------------------------------------------------
@@ -2816,15 +2821,15 @@ New trust radius                        ....     0.133333333
     ----------------------------------------------------------------------------
 
 Geometry step timings:
-Preparation and reading OPT file:      0.000 s ( 3.030 %)
-Internal coordinates            :      0.000 s ( 2.626 %)
-B/P matrices and projection     :      0.000 s (16.364 %)
-Hessian update/contruction      :      0.000 s (33.535 %)
-Making the step                 :      0.000 s ( 9.899 %)
-Converting the step to Cartesian:      0.000 s ( 4.242 %)
-Storing new data                :      0.000 s ( 4.040 %)
-Checking convergence            :      0.000 s ( 6.869 %)
-Final printing                  :      0.000 s (19.394 %)
+Preparation and reading OPT file:      0.000 s ( 4.624 %)
+Internal coordinates            :      0.000 s ( 4.913 %)
+B/P matrices and projection     :      0.000 s (23.121 %)
+Hessian update/contruction      :      0.000 s (26.590 %)
+Making the step                 :      0.000 s (10.405 %)
+Converting the step to Cartesian:      0.000 s ( 4.046 %)
+Storing new data                :      0.000 s ( 4.335 %)
+Checking convergence            :      0.000 s ( 6.647 %)
+Final printing                  :      0.000 s (15.318 %)
 Total time                      :      0.000 s
                  *******************************************************
                  *** FINAL ENERGY EVALUATION AT THE STATIONARY POINT ***
@@ -3224,7 +3229,7 @@ Iteration    Energy (Eh)           Delta-E    RMSDP     MaxDP     MaxGrad    Tim
                *           SCF CONVERGED AFTER   3 CYCLES          *
                *****************************************************
 
-Recomputing exchange energy using gridx3       ... done (    0.074 sec)
+Recomputing exchange energy using gridx3       ... done (    0.078 sec)
 Old exchange energy                            :     -6.753857736 Eh
 New exchange energy                            :     -6.753858247 Eh
 Exchange energy change after final integration :     -0.000000512 Eh
@@ -3434,28 +3439,28 @@ TIMINGS
 
 Total SCF time: 0 days 0 hours 0 min 1 sec 
 
-Total time                  ....       1.398 sec
-Sum of individual times     ....       1.340 sec  ( 95.8%)
+Total time                  ....       1.440 sec
+Sum of individual times     ....       1.376 sec  ( 95.5%)
 
-SCF preparation             ....       1.078 sec  ( 77.1%)
-Fock matrix formation       ....       0.245 sec  ( 17.6%)
-  Startup                   ....       0.001 sec  (  0.2% of F)
-  Split-RI-J                ....       0.013 sec  (  5.2% of F)
-  Chain of spheres X        ....       0.224 sec  ( 91.1% of F)
-  XC integration            ....       0.050 sec  ( 20.2% of F)
-    Basis function eval.    ....       0.017 sec  ( 34.1% of XC)
-    Density eval.           ....       0.006 sec  ( 12.7% of XC)
-    XC-Functional eval.     ....       0.007 sec  ( 14.6% of XC)
-    XC-Potential eval.      ....       0.009 sec  ( 17.6% of XC)
+SCF preparation             ....       1.088 sec  ( 75.6%)
+Fock matrix formation       ....       0.265 sec  ( 18.4%)
+  Startup                   ....       0.001 sec  (  0.4% of F)
+  Split-RI-J                ....       0.017 sec  (  6.3% of F)
+  Chain of spheres X        ....       0.239 sec  ( 90.1% of F)
+  XC integration            ....       0.053 sec  ( 19.9% of F)
+    Basis function eval.    ....       0.017 sec  ( 32.6% of XC)
+    Density eval.           ....       0.006 sec  ( 11.5% of XC)
+    XC-Functional eval.     ....       0.007 sec  ( 14.0% of XC)
+    XC-Potential eval.      ....       0.009 sec  ( 16.6% of XC)
 Diagonalization             ....       0.000 sec  (  0.0%)
 Density matrix formation    ....       0.001 sec  (  0.1%)
-Total Energy calculation    ....       0.001 sec  (  0.1%)
-Population analysis         ....       0.009 sec  (  0.6%)
-Orbital Transformation      ....       0.001 sec  (  0.1%)
+Total Energy calculation    ....       0.002 sec  (  0.2%)
+Population analysis         ....       0.010 sec  (  0.7%)
+Orbital Transformation      ....       0.002 sec  (  0.1%)
 Orbital Orthonormalization  ....       0.000 sec  (  0.0%)
-DIIS solution               ....       0.001 sec  (  0.1%)
-SOSCF solution              ....       0.004 sec  (  0.3%)
-Finished LeanSCF after   1.4 sec
+DIIS solution               ....       0.002 sec  (  0.1%)
+SOSCF solution              ....       0.005 sec  (  0.3%)
+Finished LeanSCF after   1.5 sec
 
 Maximum memory used throughout the entire LEANSCF-calculation: 5.7 MB
 
@@ -3663,11 +3668,11 @@ List of optional additional citations
 
 Timings for individual modules:
 
-Sum of individual times          ...       37.856 sec (=   0.631 min)
-Startup calculation              ...        8.790 sec (=   0.146 min)  23.2 %
-SCF iterations                   ...       18.920 sec (=   0.315 min)  50.0 %
-Property calculations            ...        1.346 sec (=   0.022 min)   3.6 %
-SCF Gradient evaluation          ...        8.795 sec (=   0.147 min)  23.2 %
-Geometry relaxation              ...        0.005 sec (=   0.000 min)   0.0 %
+Sum of individual times          ...       39.546 sec (=   0.659 min)
+Startup calculation              ...        9.198 sec (=   0.153 min)  23.3 %
+SCF iterations                   ...       19.847 sec (=   0.331 min)  50.2 %
+Property calculations            ...        1.351 sec (=   0.023 min)   3.4 %
+SCF Gradient evaluation          ...        9.137 sec (=   0.152 min)  23.1 %
+Geometry relaxation              ...        0.012 sec (=   0.000 min)   0.0 %
                              ****ORCA TERMINATED NORMALLY****
-TOTAL RUN TIME: 0 days 0 hours 0 minutes 45 seconds 857 msec
+TOTAL RUN TIME: 0 days 0 hours 0 minutes 47 seconds 765 msec

@@ -185,7 +185,11 @@ def render(folder, mol, overrides):
     if not installation.vmd_path:
         raise SystemExit("no VMD installation found")
     settings = vmd.default_settings()
-    settings.update({"width": 1200, "height": 1000, "format": "png"})
+    # deterministic framing: matrix camera, content (including the
+    # isosurface extent) fills ~1/1.55 of the frame — never cropped
+    settings.update({"width": 1400, "height": 1160, "format": "png",
+                     "camera": "custom", "custom_rot": [0.0, 0.0, 0.0],
+                     "fit_margin": 1.55})
     settings.update(overrides)
     settings["output_root"] = str(folder / "VMD_Renders")
     settings.pop("_natoms", None)
@@ -194,13 +198,13 @@ def render(folder, mol, overrides):
     project = prepared["project"]
     engine = prepared["engine"]
     size = (["-dispdev", "none"] if engine == "tachyon"
-            else ["-dispdev", "none", "-size", "1200", "1000"])
+            else ["-dispdev", "none", "-size", "1408", "1168"])
     run([installation.vmd_path] + size + ["-e", "scene/build_scene.tcl"],
         project, timeout=1200)
     tga = project / "output" / "render.tga"
     if engine == "tachyon":
         run([installation.tachyon_path, "tachyon/scene.dat",
-             "-o", "output/render.tga", "-res", "1200", "1000",
+             "-o", "output/render.tga", "-res", "1400", "1160",
              "-aasamples", "24", "-trans_raster3d", "-fullshade"],
             project, timeout=1800)
     files, _ = vmd.save_converted_images(
@@ -255,6 +259,7 @@ def example_mep(folder, name, charge, mult, geometry, esp_span=None,
     png = render(folder, mol, {
         "preset": "custom",
         "camera": "custom", "custom_rot": list(view),
+        "fit_margin": 1.55,
         "cube": {"enabled": True, "path": str(folder / "density.cube"),
                  "iso_pos": 0.001,
                  "map_path": str(folder / "esp.cube"),

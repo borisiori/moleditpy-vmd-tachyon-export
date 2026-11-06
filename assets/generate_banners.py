@@ -40,7 +40,11 @@ spec.loader.exec_module(vmd)
 from rdkit import Chem  # noqa: E402
 from rdkit.Chem import rdDetermineBonds  # noqa: E402
 
-CELL = 600          # per-render resolution
+CELL = 800          # per-render resolution (crisper cells)
+# framing: front view, matrix camera, content fills ~1/margin of the frame
+# (the reference look: molecule occupying about 60-65% of the image)
+FRAMING = {"camera": "custom", "custom_rot": [55.0, 0.0, 40.0],
+           "fit_margin": 1.45}
 WORK = Path(tempfile.mkdtemp(prefix="vmd_banners_"))
 
 REPRESENTATION_LABELS = {  # style key -> display name (sorted by label)
@@ -177,6 +181,7 @@ def main():
             "material": material,
             "material_tweaks": {},   # show every material as VMD ships it
             "preset": "custom",
+            **FRAMING,
         }
         cells.append((material, render_cell(mol, overrides,
                                             f"mat_{material}")))
@@ -192,6 +197,7 @@ def main():
                               key=lambda item: item[1]["label"].lower()):
         overrides = dict(preset)
         overrides["preset"] = key
+        overrides.update(FRAMING)
         cells.append((preset["label"],
                       render_cell(mol, overrides, f"pre_{key}")))
         print(f"  preset {preset['label']}: done")
@@ -208,6 +214,7 @@ def main():
                                    key=lambda item: item[1].lower()):
         overrides = dict(base)
         overrides.update({"style": style_key, "preset": "publication_white"})
+        overrides.update(FRAMING)
         cells.append((label, render_cell(mol, overrides,
                                          f"rep_{style_key}")))
         print(f"  representation {label}: done")

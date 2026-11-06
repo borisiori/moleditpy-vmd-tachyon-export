@@ -6,12 +6,12 @@ engine. Every render produces a publication-quality image **plus a
 complete, editable VMD scene project**, so any picture can be tweaked
 by hand in VMD and re-rendered without MoleditPy.
 
-![Isosurface map rendered from a cube opened as a molecule](examples/00_quickstart/render_preview.png)
+[![MEP of chloromethane mapped on its electron-density surface](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png)
 
-*That is one click: the cube below was opened in MoleditPy
-(File → Open), the plugin detected that the file itself was the
-volumetric data, and rendered molecule + isosurfaces with its default
-High Quality preset.*
+*Molecular electrostatic potential of chloromethane on its 0.001 a.u.
+density surface — ORCA B3LYP/def2-SVP + a Multiwfn ESP cube + this
+plugin's default High Quality preset. One of the six reproducible
+examples in [`examples/`](examples/README.md).*
 
 ## Features
 
@@ -50,20 +50,20 @@ High Quality preset.*
 From the tuned default to classic publication looks — one click, every
 parameter still editable:
 
-![All presets rendered with the plugin](assets/banner_presets.png)
+[![All presets rendered with the plugin](assets/banner_presets.png)](assets/banner_presets.png)
 
 ### Every VMD material
 
 The same molecule through all 22 VMD materials, stock forms,
 alphabetical:
 
-![Every VMD material, alphabetical](assets/banner_materials.png)
+[![Every VMD material, alphabetical](assets/banner_materials.png)](assets/banner_materials.png)
 
 ### Every representation
 
 All styles (alphabetical) on the Publication White preset:
 
-![All representations on Publication White](assets/banner_representations.png)
+[![All representations on Publication White](assets/banner_representations.png)](assets/banner_representations.png)
 
 ## Examples
 
@@ -72,17 +72,23 @@ Six complete, reproducible workflows live in
 (B3LYP/def2-SVP, seconds per molecule), outputs, cubes, rendered
 images and a step-by-step guide.
 
-| HOMO/LUMO of ethylene (π / π*) | MEP on the water density surface |
-|---|---|
-| ![](examples/01_orbitals/ethylene/render_lumo.png) | ![](examples/02_mep/water/render_mep.png) |
+**[🖼️ View the complete gallery →](examples/README.md)** — every image
+below opens at full render resolution (1400 × 1160) when clicked.
 
-| Spin density of the methyl radical | ELF localization domains of water |
-|---|---|
-| ![](examples/03_spin_elf/methyl_radical/render_spin.png) | ![](examples/03_spin_elf/water_elf/render_elf.png) |
+| Example | Render (click to view full size) | Guide |
+|---|---|---|
+| Ethylene — HOMO π | [![HOMO π of ethylene](examples/01_orbitals/ethylene/render_homo.png)](examples/01_orbitals/ethylene/render_homo.png) | [step by step](examples/01_orbitals/ethylene/README.md) |
+| Ethylene — LUMO π* | [![LUMO π* of ethylene](examples/01_orbitals/ethylene/render_lumo.png)](examples/01_orbitals/ethylene/render_lumo.png) | [step by step](examples/01_orbitals/ethylene/README.md) |
+| Formaldehyde — HOMO n(O) | [![HOMO n(O) of formaldehyde](examples/01_orbitals/formaldehyde/render_homo.png)](examples/01_orbitals/formaldehyde/render_homo.png) | [step by step](examples/01_orbitals/formaldehyde/README.md) |
+| Formaldehyde — LUMO π*(C=O) | [![LUMO π* of formaldehyde](examples/01_orbitals/formaldehyde/render_lumo.png)](examples/01_orbitals/formaldehyde/render_lumo.png) | [step by step](examples/01_orbitals/formaldehyde/README.md) |
+| Water — MEP on density surface | [![MEP of water](examples/02_mep/water/render_mep.png)](examples/02_mep/water/render_mep.png) | [step by step](examples/02_mep/water/README.md) |
+| Chloromethane — MEP, chlorine pocket | [![MEP of chloromethane](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png) | [step by step](examples/02_mep/chloromethane/README.md) |
+| Methyl radical — spin density | [![Spin density of the methyl radical](examples/03_spin_elf/methyl_radical/render_spin.png)](examples/03_spin_elf/methyl_radical/render_spin.png) | [step by step](examples/03_spin_elf/methyl_radical/README.md) |
+| Water — ELF localization domains | [![ELF domains of water](examples/03_spin_elf/water_elf/render_elf.png)](examples/03_spin_elf/water_elf/render_elf.png) | [step by step](examples/03_spin_elf/water_elf/README.md) |
 
 Also inside: the [quickstart](examples/00_quickstart/README.md)
-(cube → image in one click), formaldehyde orbitals, the chloromethane
-MEP, and a generator script that re-runs the whole gallery.
+(open a cube → image in one click) and a generator script that re-runs
+the whole gallery.
 
 ## Requirements
 

@@ -1,0 +1,70 @@
+{
+  "label": "High Quality (default)",
+  "engine": "tachyon",
+  "style": "cpk",
+  "sphere_scale": 0.8,
+  "sphere_res": 22,
+  "bond_radius": 0.3,
+  "bond_res": 22,
+  "color_mode": "element",
+  "single_color": "#8899aa",
+  "element_palette": "default",
+  "bond_color": "element",
+  "show_atoms": true,
+  "show_bonds": true,
+  "labels": "none",
+  "label_size": 1.0,
+  "label_color": "black",
+  "material": "Glossy",
+  "material_tweaks": {
+    "Glossy": {
+      "ambient": 0.1,
+      "diffuse": 0.6,
+      "opacity": 0.75,
+      "shininess": 1.0
+    }
+  },
+  "ao": false,
+  "ao_ambient": 0.8,
+  "ao_direct": 0.4,
+  "shadows": false,
+  "depthcue": false,
+  "lights": {
+    "0": true,
+    "1": true,
+    "2": false,
+    "3": true
+  },
+  "background": "white",
+  "bg_color": "#ffffff",
+  "projection": "Perspective",
+  "width": 1400,
+  "height": 1160,
+  "format": "png",
+  "aasamples": 24,
+  "transparent": false,
+  "preset": "custom",
+  "camera": "custom",
+  "match_moleditpy": false,
+  "auto_center": true,
+  "auto_fit": true,
+  "custom_rot": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "geometry_source": "current",
+  "external_path": "",
+  "use_connectivity": true,
+  "cube": {
+    "enabled": true,
+    "path": "/home/borisiori/.moleditpy/vmd_tachyon_export_project/examples/03_spin_elf/methyl_radical/spindens.cube",
+    "iso_pos": 0.002,
+    "iso_neg": -0.002,
+    "interpretation": "spin_density"
+  },
+  "output_root": "/home/borisiori/.moleditpy/vmd_tachyon_export_project/examples/03_spin_elf/methyl_radical/VMD_Renders",
+  "project_name": "",
+  "fit_margin": 1.55,
+  "_natoms": 4
+}

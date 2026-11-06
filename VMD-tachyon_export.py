@@ -797,7 +797,8 @@ def vtk_camera_to_vmd(camera, window_size):
 
 
 def preset_camera(orientation, positions, projection, auto_center=True,
-                  auto_fit=True, custom_rot=(0.0, 0.0, 0.0)):
+                  auto_fit=True, custom_rot=(0.0, 0.0, 0.0),
+                  fit_margin=1.15, fit_radius=None):
     """Compute a VMD camera for the named orientations.
 
     Bases (right, up, back=toward viewer) in world axes:
@@ -861,7 +862,8 @@ def preset_camera(orientation, positions, projection, auto_center=True,
         )
         if r_max < 1e-6:
             r_max = 1.0
-        half_height = r_max * 1.15
+        r_max = fit_radius if fit_radius else r_max
+        half_height = r_max * fit_margin
         const = (
             VMD_ORTHO_HALFHEIGHT
             if projection == "Orthographic"
@@ -899,6 +901,9 @@ def parse_cube_header(path):
             opener = open(path, "r", errors="replace")
         with opener as handle:
             lines = [handle.readline() for _ in range(2 + 4)]
+            natoms_raw = int(lines[2].split()[0]) if len(lines) > 2 else 0
+            for _ in range(abs(natoms_raw)):
+                lines.append(handle.readline())
     except (OSError, EOFError):
         return None
     if len(lines) < 6:
@@ -918,6 +923,12 @@ def parse_cube_header(path):
         if orbital:
             parts = lines[6].split() if len(lines) > 6 else []
             extra = 1
+        atom_coords = []
+        for line in lines[6:6 + abs(natoms)]:
+            parts = line.split()
+            atom_coords.append(
+                tuple(float(x) for x in parts[2:5])
+            )
         return {
             "comments": [lines[0].strip(), lines[1].strip()],
             "natoms": abs(natoms),
@@ -925,6 +936,7 @@ def parse_cube_header(path):
             "origin": origin,
             "dims": dims,
             "vectors": vectors,
+            "atom_coords": atom_coords,
             "points": npts,
             "extra_line": extra,
             "grid_points": npts,
@@ -995,6 +1007,74 @@ def cube_data_percentiles(path, header=None, low=2.0, high=98.0):
         return None
     return (float(np.percentile(values, low)),
             float(np.percentile(values, high)))
+
+
+def cube_isosurface_radius(path, isovalue, header=None,
+                           reference_positions=None):
+    """Radius (from the data centroid) reached by the |value| >= isovalue
+    region — used to FRAME renders that contain an isosurface.
+
+    Fitting only the atomic skeleton would leave big surfaces (a 0.001
+    a.u. density envelope, diffuse orbital lobes) cropped at the edges;
+    this measures what will actually be visible.
+
+    Cube files use bohr by convention (ORCA/Multiwfn included); the
+    returned radius is converted to angstroms using the header's own
+    atom coordinates against reference_positions when available.
+    """
+    import gzip
+
+    import numpy as np
+
+    path = str(path)
+    header = header or parse_cube_header(path)
+    if header is None:
+        return None
+    try:
+        with open(path, "rb") as probe:
+            magic = probe.read(2)
+        opener = (gzip.open if magic == b"\x1f\x8b" else open)
+        with opener(path, "rt", errors="replace") as handle:
+            for _ in range(2 + 4 + header["extra_line"]
+                           + header["natoms"]):
+                handle.readline()
+            tokens = handle.read().split()
+        values = np.abs(np.array(tokens, dtype=float)).reshape(
+            header["dims"][0], header["dims"][1], header["dims"][2]
+        )
+    except (OSError, ValueError, EOFError):
+        return None
+    mask = values >= abs(isovalue)
+    if not mask.any():
+        return None
+    # grid coordinates in the cube's (generally orthonormal) frame
+    nx, ny, nz = header["dims"]
+    axes = [np.arange(n) for n in (nx, ny, nz)]
+    gx, gy, gz = np.meshgrid(*axes, indexing="ij")
+    pts = np.stack([gx[mask], gy[mask], gz[mask]], axis=1).astype(float)
+    # scale each axis by its voxel vector length (A or bohr, cube units)
+    lens = [
+        float(np.linalg.norm(header["vectors"][i])) for i in range(3)
+    ]
+    pts *= np.array(lens)
+    center = pts.mean(axis=0)
+    radius = float(np.sqrt(((pts - center) ** 2).sum(axis=1)).max())
+
+    # unit conversion: cube units (bohr by convention) -> angstroms,
+    # derived from the header atoms themselves when references exist
+    if reference_positions is not None and len(reference_positions) >= 2:
+        ref = np.asarray(reference_positions, dtype=float)
+        cube_atoms = np.array(header["atom_coords"], dtype=float)
+        if len(cube_atoms) == len(ref):
+            span_cube = cube_atoms.max(axis=0) - cube_atoms.min(axis=0)
+            span_ref = ref.max(axis=0) - ref.min(axis=0)
+            valid = span_cube > 1e-6
+            if valid.any():
+                scale = float((span_cube[valid] / span_ref[valid]).mean())
+                if scale > 0.1:
+                    radius /= scale
+                    return radius
+    return radius / 1.8897259886  # bohr -> angstrom fallback
 
 
 def guess_cube_interpretation(header):
@@ -2209,6 +2289,22 @@ def prepare_project(context, settings, installation, log):
                 log(f"[camera] could not match orientation ({e}); "
                     "using the selected preset orientation")
     if camera is None:
+        # Content-aware framing: when an isosurface is rendered, fit to
+        # its real extent (from the cube) instead of the bare atom
+        # skeleton, so large surfaces are never cropped by the camera.
+        fit_radius = None
+        if cube.get("enabled") and cube.get("path"):
+            iso = min(
+                abs(float(cube.get("iso_pos", 0.005))),
+                abs(float(cube.get("iso_neg", -0.005))),
+            )
+            fit_radius = cube_isosurface_radius(
+                cube["path"], iso, cube_header,
+                reference_positions=positions,
+            )
+            if fit_radius:
+                log(f"[camera] fitting to isosurface extent "
+                    f"(radius {fit_radius:.2f})")
         camera = preset_camera(
             settings.get("camera", "auto_fit"),
             positions,
@@ -2219,6 +2315,8 @@ def prepare_project(context, settings, installation, log):
             auto_center=settings.get("auto_center", True),
             auto_fit=settings.get("auto_fit", True),
             custom_rot=settings.get("custom_rot", (0, 0, 0)),
+            fit_margin=float(settings.get("fit_margin", 1.15)),
+            fit_radius=fit_radius,
         )
     settings["match_moleditpy"] = matched
 

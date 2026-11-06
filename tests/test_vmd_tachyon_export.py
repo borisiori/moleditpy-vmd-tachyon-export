@@ -721,3 +721,45 @@ def test_cube_data_percentiles_robust_range(vmd):
     # custom percentiles
     tighter = vmd.cube_data_percentiles(cube, header, 10.0, 90.0)
     assert (tighter[1] - tighter[0]) < (robust[1] - robust[0])
+
+
+def test_cube_isosurface_radius_units_and_margin(vmd, benzene):
+    """Surface-aware framing: bohr->angstrom conversion and the
+    adjustable fit margin that the generators rely on."""
+    cube = Path(__file__).parent.parent / "examples" / "01_orbitals" / \
+        "ethylene" / "homo.cube"
+    if not cube.is_file():
+        pytest.skip("example cubes not present")
+    header = vmd.parse_cube_header(cube)
+    assert len(header["atom_coords"]) == 6
+
+    symbols, positions, _ = vmd.mol_atom_data(benzene)  # any 2+ atom ref
+    # ethylene reference positions in angstroms (from the cube itself
+    # scaled): use its own header atoms converted with the known ratio
+    import numpy as np
+
+    ref = (np.array(header["atom_coords"])
+           / ((np.array(header["atom_coords"]).max(0)
+               - np.array(header["atom_coords"]).min(0))
+              / np.array([4.696, 3.519, 0.0])).mean()).tolist() \
+        if False else None
+    radius = vmd.cube_isosurface_radius(cube, 0.05, header,
+                                        reference_positions=None)
+    # fallback conversion: bohr -> angstrom, so radius must be a sane
+    # lobe size in angstroms (not the raw bohr number)
+    assert 0.5 < radius < 4.0
+
+    # fit_margin scales the camera: margin 2.3 shows half the span of
+    # margin 1.15
+    positions = [(1, 0, 0), (0, 1, 0), (0, 0, 1)]
+    base = vmd.preset_camera("front", positions, "Orthographic",
+                             fit_margin=1.15)
+    wide = vmd.preset_camera("front", positions, "Orthographic",
+                             fit_margin=2.3)
+    assert wide["scale"] == pytest.approx(base["scale"] / 2.0)
+
+    # explicit fit_radius wins over the atom skeleton
+    fit = vmd.preset_camera("front", positions, "Orthographic",
+                            fit_radius=3.0)
+    assert fit["scale"] == pytest.approx(
+        vmd.VMD_ORTHO_HALFHEIGHT / (3.0 * 1.15))
