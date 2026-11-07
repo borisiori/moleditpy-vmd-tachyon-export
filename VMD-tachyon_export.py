@@ -1840,6 +1840,22 @@ def write_project_files(project, settings, installation, engine,
         json.dumps(settings, indent=2, ensure_ascii=False), encoding="utf-8"
     )
 
+    # Standalone launcher: double-click or ./open_in_vmd.sh opens the
+    # scene in VMD from anywhere. VMD exits when its stdin reaches EOF,
+    # so the launcher runs it inside a pseudo-terminal (script), which
+    # is also what keeps it alive when launched from a file manager.
+    vmd_bin = installation.vmd_path if installation else "vmd"
+    launcher = (
+        "#!/bin/bash\n"
+        "# Open this render scene in VMD (works from anywhere, no\n"
+        "# terminal needed: VMD is run inside a pseudo-terminal).\n"
+        'cd "$(dirname "$0")" || exit 1\n'
+        f'exec script -qec \'"{vmd_bin}" -e scene/scene.vmd\' /dev/null\n'
+    )
+    launcher_path = project / "open_in_vmd.sh"
+    launcher_path.write_text(launcher, encoding="utf-8")
+    launcher_path.chmod(0o755)
+
     manifest = {
         "generator": f"{PLUGIN_NAME} v{PLUGIN_VERSION}",
         "created": time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -1918,8 +1934,18 @@ Engine: {engine} ({engine_reason})
 
 ## Open and edit in VMD (GUI)
 
-    cd {project}
-    {installation.vmd_path if installation else "vmd"} -e scene/scene.vmd
+Three equivalent ways (VMD exits if launched without a terminal
+unless wrapped in a pseudo-terminal — the launcher handles that):
+
+1. From the MoleditPy plugin: the *Open Scene in VMD* button.
+2. The bundled launcher, from anywhere:
+
+        ./open_in_vmd.sh
+
+3. From a terminal (the classic way):
+
+        cd {project}
+        {installation.vmd_path if installation else "vmd"} -e scene/scene.vmd
 
 Rotate, change materials, representations, isosurfaces, lighting ...
 then File > Save State... over scene/scene.vmd.
