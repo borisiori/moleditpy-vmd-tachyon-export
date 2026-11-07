@@ -4055,12 +4055,10 @@ def _build_dialog_class():
                 )
 
         def _open_scene(self):
-            """Launch VMD with the scene via a self-contained launcher
-            script in the project folder (the most reliable detachment
-            method on Linux: nohup + setsid + independent process group).
-            """
-            import os
-            import shutil as _shutil
+            """Launch VMD with the scene, exactly as the user would from
+            a terminal: correct working directory, scene.vmd (the VMD
+            state snapshot that works), no stdio redirection."""
+            import subprocess
 
             project = self._current_project()
             if project is None:
@@ -4072,7 +4070,7 @@ def _build_dialog_class():
                                         "No VMD installation found.")
                     return
 
-            scene = project / "scene" / "scene.tcl"
+            scene = project / "scene" / "scene.vmd"
             if not scene.is_file():
                 QMessageBox.information(
                     self, PLUGIN_NAME,
@@ -4080,40 +4078,38 @@ def _build_dialog_class():
                 )
                 return
 
-            # Restore pruned volumetric files (cube copies removed for
-            # the repository; scene.tcl references them)
-            settings_file = project / "scene" / "render_settings.json"
-            if settings_file.is_file():
-                try:
-                    import json as _json
+            # Restore pruned volumetric files before opening
+            self._restore_pruned_cubes(project)
 
-                    saved = _json.loads(
-                        settings_file.read_text(errors="replace")
-                    )
-                    cube_info = saved.get("cube") or {}
-                    cube_path = cube_info.get("path", "")
-                    if cube_path and Path(cube_path).is_file():
-                        vol_dir = project / "volumetric"
-                        vol_dir.mkdir(exist_ok=True)
-                        dest = vol_dir / Path(cube_path).name
-                        if not dest.is_file():
-                            _shutil.copy2(cube_path, dest)
-                except (OSError, ValueError):
-                    pass
-
-            # Write a launcher script into the project and execute it.
-            # setsid creates a new session (immune to parent signals),
-            # nohup ignores hangup, & backgrounds immediately.
-            launcher = project / "open_in_vmd.sh"
-            launcher.write_text(
-                "#!/bin/bash\n"
-                f'cd "{project}"\n'
-                f'exec "{self.installation.vmd_path}" '
-                f'-e scene/scene.tcl\n',
-                encoding="utf-8",
+            subprocess.Popen(
+                [self.installation.vmd_path, "-e", "scene/scene.vmd"],
+                cwd=str(project),
+                start_new_session=True,
             )
-            os.chmod(str(launcher), 0o755)
-            os.system(f'nohup setsid "{launcher}" > /dev/null 2>&1 &')
+
+        def _restore_pruned_cubes(self, project):
+            """Copy cube files back into volumetric/ if they were pruned
+            for the repository (scene.vmd references them)."""
+            import json as _json
+            import shutil as _shutil
+
+            settings_file = project / "scene" / "render_settings.json"
+            if not settings_file.is_file():
+                return
+            try:
+                saved = _json.loads(
+                    settings_file.read_text(errors="replace")
+                )
+                cube_info = saved.get("cube") or {}
+                cube_path = cube_info.get("path", "")
+                if cube_path and Path(cube_path).is_file():
+                    vol_dir = project / "volumetric"
+                    vol_dir.mkdir(exist_ok=True)
+                    dest = vol_dir / Path(cube_path).name
+                    if not dest.is_file():
+                        _shutil.copy2(cube_path, dest)
+            except (OSError, ValueError):
+                pass
 
         def _rerender(self, edited=False):
             from PySide6.QtCore import QProcess, QProcessEnvironment
