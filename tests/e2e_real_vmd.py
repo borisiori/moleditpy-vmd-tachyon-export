@@ -214,8 +214,9 @@ def main() -> int:
         check("transparent background keyed out", keyed > 0.5,
               f"{100 * keyed:.1f}% fully transparent pixels")
 
-        # -- 6. cube isosurfaces (Multiwfn file, 30 atoms -> own molecule)
-        cube = Path(__file__).resolve().parent / "test.cub"
+        # -- 6. cube isosurfaces (orbital cube shipped with the repo)
+        cube = (Path(__file__).resolve().parent.parent
+                / "examples" / "00_quickstart" / "inputs" / "homo.cube")
         settings = vmd.default_settings()
         settings.update({
             "engine": "internal", "width": 700, "height": 700,
@@ -223,13 +224,13 @@ def main() -> int:
         })
         settings["cube"].update({
             "enabled": True, "path": str(cube),
-            "iso_pos": 0.004, "iso_neg": -0.004,
+            "iso_pos": 0.05, "iso_neg": -0.05,
         })
         prepared = vmd.prepare_project(context, settings, installation,
                                        logs.append)
         project = prepared["project"]
         check("cube copied into project",
-              (project / "volumetric" / "test.cub").is_file())
+              (project / "volumetric" / "homo.cube").is_file())
         code, errors = run([
             installation.vmd_path, "-dispdev", "none", "-size", "704",
             "704", "-e", "scene/build_scene.tcl",
@@ -244,7 +245,7 @@ def main() -> int:
         if manifest.is_file():
             data = __import__("json").loads(manifest.read_text())
             check("cube provenance in manifest",
-                  data.get("cube", {}).get("natoms") == 30)
+                  data.get("cube", {}).get("natoms") == 6)
 
     print()
     if failures:

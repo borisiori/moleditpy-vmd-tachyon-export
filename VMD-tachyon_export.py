@@ -41,7 +41,7 @@ from pathlib import Path
 
 # ------------------------------------------------------------------ metadata
 PLUGIN_NAME = "VMD-Tachyon Export"
-PLUGIN_VERSION = "2026.11.04"
+PLUGIN_VERSION = "2026.11.07"
 PLUGIN_AUTHOR = "borisiori"
 PLUGIN_LICENSE = "LGPL-3.0-or-later"
 PLUGIN_DESCRIPTION = (
@@ -2553,7 +2553,7 @@ class RenderRunner:
             f"Tachyon: ray-tracing {width}x{height} "
             f"(AA {aasamples} samples)"
         )
-        # -trans_raster3d + -fullshade: borisiori's re_renderizar.sh
+        # -trans_raster3d + -fullshade: reference-pipeline render flags
         # post-render flags (Raster3D angle-based transparency for the
         # translucent Glossy lobes, full shading quality)
         args = [

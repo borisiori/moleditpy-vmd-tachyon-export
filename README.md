@@ -160,7 +160,7 @@ python examples/generate_examples.py                # regenerate the gallery
 
 ## Version
 
-**2026.11.04** — initial release. See
+**2026.11.07** — see
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Author

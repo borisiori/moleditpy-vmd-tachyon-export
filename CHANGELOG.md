@@ -1,5 +1,53 @@
 # Changelog
 
+## 2026.11.07
+
+Quality and usability release on top of the initial 2026.11.04
+version. All renders produced by earlier versions remain fully
+compatible and re-renderable.
+
+### Rendering & camera
+
+- Content-aware framing: the camera now fits the real isosurface
+  extent measured from the cube (with automatic bohr → angstrom
+  conversion), so orbital lobes, MEP density surfaces and ELF
+  domains are never cropped. Adjustable fit margin.
+- Property-map color ranges (MEP etc.) are auto-filled from
+  percentiles instead of raw min/max, which the near-nuclear
+  electrostatic potential used to wash out.
+- New neutral gray background (#2b2b2b); the High Gloss preset now
+  uses it instead of pure black.
+
+### User interface
+
+- The render dialog is now scrollable and the Render button bar
+  stays fixed and always visible.
+- Fixed "Open Scene in VMD": VMD exits when its stdin reaches EOF,
+  so the button now launches it inside a pseudo-terminal
+  (platform-specific, verified). Every render project also ships an
+  `open_in_vmd.sh` launcher that opens the scene from anywhere —
+  double-click included.
+- Cross-platform VMD detection (Linux, Windows, macOS) with a
+  diagnostics dialog that names the missing dependency with per-OS
+  guidance.
+
+### Examples & documentation
+
+- Six fully reproducible ORCA/Multiwfn examples (orbitals, MEP,
+  spin density, ELF) with user-approved viewing angles and English
+  step-by-step guides, plus a quickstart.
+- Visual README (comparison banners, clickable full-resolution
+  gallery) and a References section citing MoleditPy, VMD, ORCA and
+  Multiwfn.
+
+### Repository hygiene
+
+- No personal calculation data: the private test cube was replaced
+  by a synthetic in-memory fixture; example inputs are generic.
+- External binaries (ORCA, Multiwfn) are located via environment
+  variables, PATH or a home-relative layout — no hardcoded
+  usernames.
+
 ## 2026.11.04 — Initial release
 
 First public version of **VMD-Tachyon Export**, a MoleditPy plugin that

@@ -34,10 +34,27 @@ spec.loader.exec_module(vmd)
 from rdkit import Chem  # noqa: E402
 from rdkit.Chem import rdDetermineBonds  # noqa: E402
 
-ORCA = os.environ.get("ORCA_BIN", "/home/borisiori/Programas/ORCA/orca")
-MULTIWFN = os.environ.get(
-    "MULTIWFN_BIN", "/home/borisiori/Programas/Multiwfn/Multiwfn"
-)
+def _find_binary(env_var, name):
+    """Locate an external binary: env override, PATH, then a
+    Programas/<name> layout under the user's home (no hardcoded
+    usernames)."""
+    override = os.environ.get(env_var, "").strip()
+    if override:
+        return override
+    found = shutil.which(name)
+    if found:
+        return found
+    guess = Path.home() / "Programas" / name.capitalize() / name
+    if name == "orca":
+        guess = Path.home() / "Programas" / "ORCA" / "orca"
+    for candidate in (guess, guess.parent / "bin" / name):
+        if candidate.is_file():
+            return str(candidate)
+    return name  # let the shell report a clear 'not found'
+
+
+ORCA = _find_binary("ORCA_BIN", "orca")
+MULTIWFN = _find_binary("MULTIWFN_BIN", "Multiwfn")
 LEVEL = "! B3LYP def2-SVP Opt"          # simple, seconds per molecule
 GRID = "80 80 80"                        # orca_plot grid resolution
 
