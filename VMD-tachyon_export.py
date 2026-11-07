@@ -4055,10 +4055,13 @@ def _build_dialog_class():
                 )
 
         def _open_scene(self):
+            import os
+            import shutil as _shutil
+
             project = self._current_project()
             if project is None:
                 return
-            scene = project / "scene" / "scene.vmd"
+            scene = project / "scene" / "scene.tcl"
             if not scene.is_file():
                 QMessageBox.information(
                     self, PLUGIN_NAME,
@@ -4071,12 +4074,35 @@ def _build_dialog_class():
                     QMessageBox.warning(self, PLUGIN_NAME,
                                         "No VMD installation found.")
                     return
-            # Detach VMD completely: nohup + background (&) is the
-            # most reliable way to launch a GUI application on Linux
-            # from within another GUI application — survives parent exit
-            import os
 
+            # Restore pruned volumetric files before opening the scene:
+            # render projects are pruned for the repository (cube copies
+            # removed from volumetric/) but scene.tcl references them
+            settings_file = project / "scene" / "render_settings.json"
+            if settings_file.is_file():
+                try:
+                    import json as _json
+
+                    saved = _json.loads(
+                        settings_file.read_text(errors="replace")
+                    )
+                    cube_info = saved.get("cube") or {}
+                    cube_path = cube_info.get("path", "")
+                    if cube_path and Path(cube_path).is_file():
+                        vol_dir = project / "volumetric"
+                        vol_dir.mkdir(exist_ok=True)
+                        dest = vol_dir / Path(cube_path).name
+                        if not dest.is_file():
+                            _shutil.copy2(cube_path, dest)
+                except (OSError, ValueError):
+                    pass  # best-effort restore
+
+            # Launch VMD with the editable scene (scene.tcl has relative
+            # paths and no batch-mode state; scene.vmd is a snapshot that
+            # may reference pruned files with stale absolute paths).
+            # nohup + & fully detaches from MoleditPy.
             os.system(
+                f'cd "{project}" && '
                 f'nohup "{self.installation.vmd_path}" '
                 f'-e "{scene}" > /dev/null 2>&1 &'
             )
