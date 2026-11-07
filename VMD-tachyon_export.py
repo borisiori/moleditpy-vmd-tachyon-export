@@ -4055,8 +4055,7 @@ def _build_dialog_class():
                 )
 
         def _open_scene(self):
-            from PySide6.QtCore import QUrl
-            from PySide6.QtGui import QDesktopServices
+            from PySide6.QtCore import QProcess
 
             project = self._current_project()
             if project is None:
@@ -4068,7 +4067,17 @@ def _build_dialog_class():
                     f"{scene} does not exist yet — render first.",
                 )
                 return
-            QDesktopServices.openUrl(QUrl.fromLocalFile(str(scene)))
+            if not self.installation.vmd_path:
+                self._detect_vmd()
+                if not self.installation.vmd_path:
+                    QMessageBox.warning(self, PLUGIN_NAME,
+                                        "No VMD installation found.")
+                    return
+            # Launch VMD explicitly (QDesktopServices would use the
+            # system file association for .vmd, which may not be VMD)
+            QProcess.startDetached(
+                self.installation.vmd_path, ["-e", str(scene)]
+            )
 
         def _rerender(self, edited=False):
             from PySide6.QtCore import QProcess, QProcessEnvironment
