@@ -26,6 +26,48 @@ def load_plugin():
     return module
 
 
+
+
+# ---------------------------------------------------------------- fixtures
+# A tiny synthetic H2O cube (7.8 KB) generated in-memory: keeps the test
+# suite self-contained without shipping personal calculation data.
+import numpy as np
+
+
+def _make_synthetic_cube(tmp_path):
+    """H2O density-like cube (8³ grid, positive near O, negative near H)."""
+    natoms, origin, n, step = 3, (-4.0, -4.0, -4.0), (8, 8, 8), 1.0
+    atoms = [(8, 0.0, 0.0, 0.117), (1, 0.0, 0.757, -0.469),
+             (1, 0.0, -0.757, -0.469)]
+    lines = [
+        "Synthetic H2O cube for unit tests",
+        "generated fixture",
+        f"{natoms:5d} {origin[0]:12.6f} {origin[1]:12.6f} {origin[2]:12.6f}",
+    ]
+    for count, vec in ((n[0], (step, 0, 0)), (n[1], (0, step, 0)),
+                       (n[2], (0, 0, step))):
+        lines.append(
+            f"{count:5d} {vec[0]:12.6f} {vec[1]:12.6f} {vec[2]:12.6f}")
+    for num, x, y, z in atoms:
+        lines.append(f"{num:5d} {0.0:12.6f} {x:12.6f} {y:12.6f} {z:12.6f}")
+    coords = [origin[i] + np.arange(n[i]) * step for i in range(3)]
+    X, Y, Z = np.meshgrid(*coords, indexing="ij")
+    r_O = np.sqrt((X - atoms[0][1])**2 + (Y - atoms[0][2])**2
+                  + (Z - atoms[0][3])**2)
+    r_H = np.minimum(
+        np.sqrt((X - atoms[1][1])**2 + (Y - atoms[1][2])**2
+                + (Z - atoms[1][3])**2),
+        np.sqrt((X - atoms[2][1])**2 + (Y - atoms[2][2])**2
+                + (Z - atoms[2][3])**2))
+    data = 0.8 * np.exp(-2 * r_O**2) - 0.3 * np.exp(-3 * r_H**2)
+    flat = data.ravel()
+    for i in range(0, len(flat), 6):
+        lines.append("  " + " ".join(f"{v:13.5E}" for v in flat[i:i + 6]))
+    path = tmp_path / "synthetic_h2o.cub"
+    path.write_text("\n".join(lines) + "\n")
+    return path
+
+
 @pytest.fixture(scope="module")
 def vmd():
     return load_plugin()
@@ -131,20 +173,20 @@ def test_external_geometry_bond_transfer(vmd, benzene, tmp_path):
     assert "without bonds" in message2
 
 
-def test_external_geometry_from_cube(vmd):
+def test_external_geometry_from_cube(vmd, tmp_path):
     """A .cub/.cube can be the external geometry itself: atoms are read
     from the cube header (atomic numbers)."""
-    cube = Path(__file__).parent / "test.cub"
+    cube = _make_synthetic_cube(tmp_path)
     symbols, positions, bonds, message = vmd.load_external_geometry(
         cube, current_mol=None
     )
-    assert symbols is not None and len(symbols) == 30
-    assert "Cl" in symbols and "C" in symbols
+    assert symbols is not None and len(symbols) == 3
+    assert "O" in symbols and "H" in symbols
     assert all(len(p) == 3 for p in positions)
     assert bonds == []  # no molecule to transfer from
 
 
-def test_cube_auto_association(vmd, benzene):
+def test_cube_auto_association(vmd, benzene, tmp_path):
     """A molecule loaded FROM a cube file gets its isosurface for free:
     prepare_project auto-associates the current file as volumetric data."""
 
@@ -169,9 +211,8 @@ def test_cube_auto_association(vmd, benzene):
 
     mol = Chem.AddHs(Chem.MolFromSmiles("c1ccc(cc1)Cl"))
     AllChem.EmbedMolecule(mol, randomSeed=3)  # 12 atoms -> mismatch case
-    context = CubeFileContext(
-        mol, str(Path(__file__).parent / "test.cub")
-    )
+    cube = _make_synthetic_cube(tmp_path)
+    context = CubeFileContext(mol, str(cube))
     settings = vmd.default_settings()
     settings["output_root"] = str(Path(tempfile.mkdtemp()))
     logs = []
@@ -182,9 +223,8 @@ def test_cube_auto_association(vmd, benzene):
     assert any("not auto-associated" in line for line in logs)
 
     # matching atom count -> auto-associated with the isosurface on
-    cube_symbols, cube_positions = vmd._atoms_from_cube_file(
-        Path(__file__).parent / "test.cub"
-    )
+    cube = _make_synthetic_cube(tmp_path)
+    cube_symbols, cube_positions = vmd._atoms_from_cube_file(cube)
     builder = Chem.RWMol()
     for symbol in cube_symbols:
         builder.AddAtom(Chem.Atom(symbol))
@@ -195,15 +235,14 @@ def test_cube_auto_association(vmd, benzene):
     cube_mol.AddConformer(conformer)
     logs = []
     prepared = vmd.prepare_project(
-        CubeFileContext(cube_mol, str(Path(__file__).parent
-                                      / "test.cub")),
+        CubeFileContext(cube_mol, str(cube)),
         settings, vmd.VmdInstallation(), logs.append,
     )
     assert prepared["settings"]["cube"]["enabled"]
-    assert prepared["settings"]["cube"]["path"].endswith("test.cub")
+    assert prepared["settings"]["cube"]["path"].endswith("synthetic_h2o.cub")
     assert any("auto-associated" in line for line in logs)
     scene = (prepared["project"] / "scene" / "scene.tcl").read_text()
-    assert "volumetric/test.cub" in scene
+    assert "volumetric/synthetic_h2o.cub" in scene
     assert "Isosurface" in scene
 
 
@@ -429,18 +468,15 @@ def test_preset_camera_orientations(vmd):
 
 # -------------------------------------------------------------- cube data
 
-def test_cube_header_and_range(vmd):
-    header = vmd.parse_cube_header(
-        Path(__file__).parent / "test.cub"
-    )
+def test_cube_header_and_range(vmd, tmp_path):
+    cube = _make_synthetic_cube(tmp_path)
+    header = vmd.parse_cube_header(cube)
     assert header is not None
-    assert header["natoms"] == 30
-    assert header["points"] == 531360
-    data_range = vmd.cube_data_range(
-        Path(__file__).parent / "test.cub", header
-    )
-    assert data_range[0] == pytest.approx(-0.0205, abs=1e-4)
-    assert data_range[1] == pytest.approx(0.0308, abs=1e-4)
+    assert header["natoms"] == 3
+    assert header["points"] == 512  # 8^3
+    data_range = vmd.cube_data_range(cube, header)
+    assert data_range[0] < -0.05     # negative region near the H atoms
+    assert data_range[1] > 0.5       # positive peak near the O atom
 
 
 def test_cube_interpretation_guess(vmd):
@@ -707,18 +743,17 @@ def test_find_vmd_on_this_machine(vmd):
     assert vmd.find_vmd().endswith("vmd")
 
 
-def test_cube_data_percentiles_robust_range(vmd):
+def test_cube_data_percentiles_robust_range(vmd, tmp_path):
     """Percentiles bracket the meaningful range where min/max would be
     dominated by near-nuclear extremes (e.g. ESP ~ +150 a.u.)."""
-    cube = Path(__file__).parent / "test.cub"
+    cube = _make_synthetic_cube(tmp_path)
     header = vmd.parse_cube_header(cube)
     full = vmd.cube_data_range(cube, header)
     robust = vmd.cube_data_percentiles(cube, header)
     assert robust is not None
     assert full[0] <= robust[0] <= robust[1] <= full[1]
-    # percentile span must be far narrower than the min/max span
+    # percentile span must be narrower than the min/max span
     assert (robust[1] - robust[0]) < (full[1] - full[0])
-    # custom percentiles
     tighter = vmd.cube_data_percentiles(cube, header, 10.0, 90.0)
     assert (tighter[1] - tighter[0]) < (robust[1] - robust[0])
 
