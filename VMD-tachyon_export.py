@@ -2777,7 +2777,16 @@ def _build_dialog_class():
             self.settings = default_settings()
             self._load_persisted()
 
-            root = QVBoxLayout(self)
+            # Scrollable content: the results panel appears below the
+            # render bar and must stay reachable on any screen size
+            from PySide6.QtWidgets import QScrollArea
+
+            scroll = QScrollArea(self)
+            scroll.setWidgetResizable(True)
+            scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+            content = QWidget()
+            root = QVBoxLayout(content)
+            root.setContentsMargins(0, 0, 0, 0)
             root.addWidget(self._build_setup_group())
             root.addWidget(self._build_preset_row())
             self.tabs = QTabWidget()
@@ -2792,6 +2801,10 @@ def _build_dialog_class():
             root.addWidget(self._build_render_bar())
             self.results_group = self._build_results_group()
             root.addWidget(self.results_group)
+            scroll.setWidget(content)
+            outer = QVBoxLayout(self)
+            outer.setContentsMargins(4, 4, 4, 4)
+            outer.addWidget(scroll)
 
             self._apply_settings_to_ui()
             self.preset_combo.currentIndexChanged.connect(self._apply_preset)
