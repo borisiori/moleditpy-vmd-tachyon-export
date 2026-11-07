@@ -1213,7 +1213,7 @@ PRESETS = {
         "material": "Glossy",
         "ao": False, "ao_ambient": 0.8, "ao_direct": 0.4,
         "shadows": True, "depthcue": False,
-        "background": "black", "bg_color": "#000000",
+        "background": "gray", "bg_color": "#2b2b2b",
         "projection": "Perspective",
         "width": 3000, "height": 3000, "format": "png",
         "aasamples": 16, "transparent": False,
@@ -1605,8 +1605,9 @@ def _background_tcl(settings):
     mode = settings.get("background", "white")
     if mode == "white":
         return "color Display Background white"
-    if mode == "black":
-        return "color Display Background black"
+    if mode == "gray":
+        return ("color change rgb 34 0.1695 0.1695 0.1695\n"
+                "color Display Background 34")
     if mode == "dark_gray":
         r, g, b = _hex_to_rgb01(settings.get("bg_color", "#26262b"))
     else:  # custom
@@ -2123,9 +2124,11 @@ def resolve_background_rgb(settings):
     mode = settings.get("background", "white")
     if mode == "white":
         return (255, 255, 255)
-    if mode == "black":
-        return (0, 0, 0)
-    return _hex_to_rgb255(settings.get("bg_color", "#26262b"))
+    if mode == "gray":
+        return (43, 43, 43)  # neutral gray, matches the reference renders
+    if mode == "dark_gray":
+        return _hex_to_rgb255(settings.get("bg_color", "#26262b"))
+    return _hex_to_rgb255(settings.get("bg_color", "#2b2b2b"))
 
 
 def prepare_project(context, settings, installation, log):
@@ -3120,7 +3123,7 @@ def _build_dialog_class():
             bg_grid = QGridLayout(bg)
             self.background_combo = QComboBox()
             for key, label in (
-                ("white", "White"), ("black", "Black"),
+                ("white", "White"), ("gray", "Gray"),
                 ("dark_gray", "Dark Gray"), ("custom", "Custom RGB"),
                 ("transparent", "Transparent (post-processed PNG)"),
             ):
