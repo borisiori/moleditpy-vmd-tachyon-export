@@ -54,7 +54,7 @@ PLUGIN_SUPPORTED_MOLEDITPY_VERSION = ">=5.0.0, <6.0.0"
 # No PLUGIN_SUPPORTED_OS: the plugin is not OS-restricted (the registry
 # expects that constant only for restricted plugins). VMD itself is an
 # external program available for Linux, Windows and macOS.
-PLUGIN_TAGS = ["Rendering", "Export", "3D"]
+PLUGIN_TAGS = ["File", "Utility", "Visualization"]
 
 PLUGIN_CONTEXT = None
 
