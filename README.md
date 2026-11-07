@@ -6,12 +6,12 @@ engine. Every render produces a publication-quality image **plus a
 complete, editable VMD scene project**, so any picture can be tweaked
 by hand in VMD and re-rendered without MoleditPy.
 
-[![MEP of chloromethane mapped on its electron-density surface](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png)
+[![HOMO of formaldehyde: the oxygen lone pair](examples/01_orbitals/formaldehyde/render_homo.png)](examples/01_orbitals/formaldehyde/render_homo.png)
 
-*Molecular electrostatic potential of chloromethane on its 0.001 a.u.
-density surface — ORCA B3LYP/def2-SVP + a Multiwfn ESP cube + this
-plugin's default High Quality preset. One of the six reproducible
-examples in [`examples/`](examples/README.md).*
+*The HOMO of formaldehyde — the n(O) lone pair — rendered from an
+ORCA B3LYP/def2-SVP orbital cube with this plugin's default High
+Quality preset. One of the six reproducible examples in
+[`examples/`](examples/README.md).*
 
 ## Features
 
