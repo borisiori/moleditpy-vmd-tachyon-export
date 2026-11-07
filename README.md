@@ -6,12 +6,12 @@ engine. Every render produces a publication-quality image **plus a
 complete, editable VMD scene project**, so any picture can be tweaked
 by hand in VMD and re-rendered without MoleditPy.
 
-[![HOMO of formaldehyde: the oxygen lone pair](examples/01_orbitals/formaldehyde/render_homo.png)](examples/01_orbitals/formaldehyde/render_homo.png)
+[![HOMO of ethylene: the bonding π orbital](examples/01_orbitals/ethylene/render_homo.png)](examples/01_orbitals/ethylene/render_homo.png)
 
-*The HOMO of formaldehyde — the n(O) lone pair — rendered from an
-ORCA B3LYP/def2-SVP orbital cube with this plugin's default High
-Quality preset. One of the six reproducible examples in
-[`examples/`](examples/README.md).*
+*The HOMO of ethylene — the bonding π orbital — viewed from 45° above
+the molecular plane. Rendered from an ORCA B3LYP/def2-SVP orbital cube
+with this plugin's default High Quality preset. One of the six
+reproducible examples in [`examples/`](examples/README.md).*
 
 ## Features
 
@@ -54,14 +54,13 @@ parameter still editable:
 
 ### Every VMD material
 
-The same molecule through all 22 VMD materials, stock forms,
-alphabetical:
+The same molecule through all 22 VMD materials, stock forms:
 
-[![Every VMD material, alphabetical](assets/banner_materials.png)](assets/banner_materials.png)
+[![Every VMD material](assets/banner_materials.png)](assets/banner_materials.png)(assets/banner_materials.png)
 
 ### Every representation
 
-All styles (alphabetical) on the Publication White preset:
+All styles on the Publication White preset:
 
 [![All representations on Publication White](assets/banner_representations.png)](assets/banner_representations.png)
 
