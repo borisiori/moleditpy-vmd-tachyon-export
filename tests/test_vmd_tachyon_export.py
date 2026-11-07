@@ -134,7 +134,7 @@ def test_external_geometry_bond_transfer(vmd, benzene, tmp_path):
 def test_external_geometry_from_cube(vmd):
     """A .cub/.cube can be the external geometry itself: atoms are read
     from the cube header (atomic numbers)."""
-    cube = Path(__file__).parent.parent / "test.cub"
+    cube = Path(__file__).parent / "test.cub"
     symbols, positions, bonds, message = vmd.load_external_geometry(
         cube, current_mol=None
     )
@@ -170,7 +170,7 @@ def test_cube_auto_association(vmd, benzene):
     mol = Chem.AddHs(Chem.MolFromSmiles("c1ccc(cc1)Cl"))
     AllChem.EmbedMolecule(mol, randomSeed=3)  # 12 atoms -> mismatch case
     context = CubeFileContext(
-        mol, str(Path(__file__).parent.parent / "test.cub")
+        mol, str(Path(__file__).parent / "test.cub")
     )
     settings = vmd.default_settings()
     settings["output_root"] = str(Path(tempfile.mkdtemp()))
@@ -183,7 +183,7 @@ def test_cube_auto_association(vmd, benzene):
 
     # matching atom count -> auto-associated with the isosurface on
     cube_symbols, cube_positions = vmd._atoms_from_cube_file(
-        Path(__file__).parent.parent / "test.cub"
+        Path(__file__).parent / "test.cub"
     )
     builder = Chem.RWMol()
     for symbol in cube_symbols:
@@ -195,7 +195,7 @@ def test_cube_auto_association(vmd, benzene):
     cube_mol.AddConformer(conformer)
     logs = []
     prepared = vmd.prepare_project(
-        CubeFileContext(cube_mol, str(Path(__file__).parent.parent
+        CubeFileContext(cube_mol, str(Path(__file__).parent
                                       / "test.cub")),
         settings, vmd.VmdInstallation(), logs.append,
     )
@@ -431,13 +431,13 @@ def test_preset_camera_orientations(vmd):
 
 def test_cube_header_and_range(vmd):
     header = vmd.parse_cube_header(
-        Path(__file__).parent.parent / "test.cub"
+        Path(__file__).parent / "test.cub"
     )
     assert header is not None
     assert header["natoms"] == 30
     assert header["points"] == 531360
     data_range = vmd.cube_data_range(
-        Path(__file__).parent.parent / "test.cub", header
+        Path(__file__).parent / "test.cub", header
     )
     assert data_range[0] == pytest.approx(-0.0205, abs=1e-4)
     assert data_range[1] == pytest.approx(0.0308, abs=1e-4)
@@ -710,7 +710,7 @@ def test_find_vmd_on_this_machine(vmd):
 def test_cube_data_percentiles_robust_range(vmd):
     """Percentiles bracket the meaningful range where min/max would be
     dominated by near-nuclear extremes (e.g. ESP ~ +150 a.u.)."""
-    cube = Path(__file__).parent.parent / "test.cub"
+    cube = Path(__file__).parent / "test.cub"
     header = vmd.parse_cube_header(cube)
     full = vmd.cube_data_range(cube, header)
     robust = vmd.cube_data_percentiles(cube, header)

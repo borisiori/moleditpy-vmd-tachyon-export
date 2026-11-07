@@ -11,10 +11,20 @@ venv/
 Thumbs.db
 *.swp
 
-# Local scratch never meant for the repository
+# Local development (not for the published repository)
+sync_*.sh
 vmdprobe_*
-/tmp/
-*.log.tmp
 
-# The examples generator prunes old render projects itself; nothing
-# example-related is ignored on purpose (the gallery ships complete).
+# ORCA / Multiwfn scratch files (regenerated on every run)
+examples/*/*/*.bibtex
+examples/*/*/*.densitiesinfo
+examples/*/*/*.opt
+examples/*/*/*.property.txt
+examples/*/*/*.engrad
+examples/*/*/*.tmp
+examples/*/*/*.structures
+examples/*/*/MOvalue.cub
+examples/*/*/totesp.cub
+
+# Local render projects beyond what ships with the repository
+# (the examples generator prunes these itself)

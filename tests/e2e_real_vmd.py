@@ -215,7 +215,7 @@ def main() -> int:
               f"{100 * keyed:.1f}% fully transparent pixels")
 
         # -- 6. cube isosurfaces (Multiwfn file, 30 atoms -> own molecule)
-        cube = Path(__file__).resolve().parent.parent / "test.cub"
+        cube = Path(__file__).resolve().parent / "test.cub"
         settings = vmd.default_settings()
         settings.update({
             "engine": "internal", "width": 700, "height": 700,

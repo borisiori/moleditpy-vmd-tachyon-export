@@ -390,9 +390,16 @@ def prune_for_repo(keep):
             molden.unlink()
         for scratch in list(folder.glob("*.tmp")) + \
                 list(folder.glob("*.densities")) + \
+                list(folder.glob("*.densitiesinfo")) + \
                 list(folder.glob("*.engrad")) + \
                 list(folder.glob("*.property.txt")) + \
-                list(folder.glob("*.xyz")):
+                list(folder.glob("*.opt")) + \
+                list(folder.glob("*.bibtex")) + \
+                list(folder.glob("*.xyz")) + \
+                list(folder.glob("*.structures")) + \
+                list(folder.glob("MOvalue.cub")) + \
+                list(folder.glob("totesp.cub")) + \
+                list(folder.glob("80")):
             scratch.unlink()  # kept: inp, out, gbw, cubes, png, projects
 
 
