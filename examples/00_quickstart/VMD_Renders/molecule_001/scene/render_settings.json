@@ -39,17 +39,17 @@
   "bg_color": "#ffffff",
   "projection": "Perspective",
   "width": 1400,
-  "height": 1100,
-  "format": "tga",
+  "height": 1160,
+  "format": "png",
   "aasamples": 24,
   "transparent": false,
   "preset": "high_quality",
-  "camera": "auto_fit",
+  "camera": "custom",
   "match_moleditpy": false,
   "auto_center": true,
   "auto_fit": true,
   "custom_rot": [
-    0.0,
+    45.0,
     0.0,
     0.0
   ],
@@ -58,23 +58,13 @@
   "use_connectivity": true,
   "cube": {
     "enabled": true,
-    "path": "/home/borisiori/.moleditpy/vmd_tachyon_export_project/test.cub",
-    "interpretation": "other",
-    "show_pos": true,
-    "show_neg": true,
-    "iso_pos": 0.005,
-    "iso_neg": -0.005,
-    "pos_color": "#1e90ff",
-    "neg_color": "#e81717",
-    "opacity": 0.75,
-    "material": "Glossy",
-    "show_molecule": true,
-    "map_path": "",
-    "map_low": -0.03,
-    "map_high": 0.0,
-    "map_colormap": "BWR"
+    "path": "examples/00_quickstart/inputs/homo.cube",
+    "iso_pos": 0.05,
+    "iso_neg": -0.05,
+    "interpretation": "orbital"
   },
-  "output_root": "example_1/VMD_Renders",
+  "output_root": "examples/00_quickstart/VMD_Renders",
   "project_name": "",
-  "_natoms": 30
+  "fit_margin": 1.55,
+  "_natoms": 6
 }

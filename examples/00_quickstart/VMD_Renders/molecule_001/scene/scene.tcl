@@ -53,23 +53,24 @@ set molreps [molinfo $mol get numreps]
 # --- atom labels (indices are 0-based, same order as MoleditPy) ---
 
 # --- volumetric data (isosurfaces) ---
-mol addfile volumetric/test.cub type cube waitfor all
-material change opacity Glossy 0.7500
+mol addfile volumetric/homo.cube type cube waitfor all
 color change rgb 31 0.1176 0.5647 1.0000
-mol representation Isosurface 0.005000 0 0 0 1 1
+mol representation Isosurface 0.050000 0 0 0 1 1
 mol color ColorID 31
 mol material Glossy
 mol addrep $mol
 color change rgb 32 0.9098 0.0902 0.0902
-mol representation Isosurface -0.005000 0 0 0 1 1
+mol representation Isosurface -0.050000 0 0 0 1 1
 mol color ColorID 32
 mol material Glossy
 mol addrep $mol
 
 # --- camera (center/rotate/scale; see README) ---
-display resetview
-display distance -8.0
-display height 10
+foreach _m [molinfo list] {
+  molinfo $_m set rotate_matrix {{ {1.0 0.0 0.0 0.0} {0.0 0.7071067811865476 0.7071067811865475 0.0} {0.0 -0.7071067811865475 0.7071067811865476 0.0} {0.0 0.0 0.0 1.0} }}
+  molinfo $_m set scale_matrix {{ {0.5532909168322048 0.0 0.0 0.0} {0.0 0.5532909168322048 0.0 0.0} {0.0 0.0 0.5532909168322048 0.0} {0.0 0.0 0.0 1.0} }}
+  molinfo $_m set center_matrix {{ {1.0 0.0 0.0 -3.700743415417188e-17} {0.0 1.0 0.0 8.819742110740682e-08} {0.0 0.0 1.0 -0.0} {0.0 0.0 0.0 1.0} }}
+}
 display projection Perspective
 display nearclip set 0.01
 display farclip set 100000.0
