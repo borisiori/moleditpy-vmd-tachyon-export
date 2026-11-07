@@ -4055,8 +4055,6 @@ def _build_dialog_class():
                 )
 
         def _open_scene(self):
-            from PySide6.QtCore import QProcess
-
             project = self._current_project()
             if project is None:
                 return
@@ -4073,10 +4071,16 @@ def _build_dialog_class():
                     QMessageBox.warning(self, PLUGIN_NAME,
                                         "No VMD installation found.")
                     return
-            # Launch VMD explicitly (QDesktopServices would use the
-            # system file association for .vmd, which may not be VMD)
-            QProcess.startDetached(
-                self.installation.vmd_path, ["-e", str(scene)]
+            # Fully detach VMD from MoleditPy: new session, no inherited
+            # stdio, survives after the dialog and the host are closed
+            import subprocess
+
+            subprocess.Popen(
+                [self.installation.vmd_path, "-e", str(scene)],
+                start_new_session=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                cwd=str(project),
             )
 
         def _rerender(self, edited=False):
