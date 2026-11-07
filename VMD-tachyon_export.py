@@ -4071,16 +4071,14 @@ def _build_dialog_class():
                     QMessageBox.warning(self, PLUGIN_NAME,
                                         "No VMD installation found.")
                     return
-            # Fully detach VMD from MoleditPy: new session, no inherited
-            # stdio, survives after the dialog and the host are closed
-            import subprocess
+            # Detach VMD completely: nohup + background (&) is the
+            # most reliable way to launch a GUI application on Linux
+            # from within another GUI application — survives parent exit
+            import os
 
-            subprocess.Popen(
-                [self.installation.vmd_path, "-e", str(scene)],
-                start_new_session=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                cwd=str(project),
+            os.system(
+                f'nohup "{self.installation.vmd_path}" '
+                f'-e "{scene}" > /dev/null 2>&1 &'
             )
 
         def _rerender(self, edited=False):
