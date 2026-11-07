@@ -132,26 +132,24 @@ def _font(size, bold=False):
     return ImageFont.truetype(str(fonts / name), size)
 
 
-def compose_banner(title, cells, columns, out_path, cell_size=340):
-    """Grid of labeled renders -> one big banner PNG."""
+def compose_banner(cells, columns, out_path, cell_size=340):
+    """Grid of labeled renders -> one big banner PNG (no title: the README
+    sections already name each banner)."""
     from PIL import Image, ImageDraw
 
     label_font = _font(int(cell_size * 0.062) + 6)
-    title_font = _font(int(cell_size * 0.105) + 8, bold=True)
     pad = int(cell_size * 0.05)
     label_h = int(cell_size * 0.14)
-    title_h = int(cell_size * 0.24)
     rows = (len(cells) + columns - 1) // columns
     width = columns * (cell_size + pad) + pad
-    height = title_h + rows * (cell_size + label_h + pad) + pad
+    height = rows * (cell_size + label_h + pad) + pad
     banner = Image.new("RGB", (width, height), (255, 255, 255))
     draw = ImageDraw.Draw(banner)
-    draw.text((pad, pad // 2), title, fill=(40, 40, 40), font=title_font)
 
     for index, (label, image) in enumerate(cells):
         row, col = divmod(index, columns)
         x = pad + col * (cell_size + pad)
-        y = title_h + row * (cell_size + label_h + pad)
+        y = row * (cell_size + label_h + pad)
         thumb = image.resize(
             (cell_size, cell_size), Image.Resampling.LANCZOS
         )
@@ -187,7 +185,6 @@ def main():
                                             f"mat_{material}")))
         print(f"  material {material}: done")
     compose_banner(
-        "VMD materials — one molecule, every material (alphabetical)",
         cells, columns=6, out_path=str(HERE / "banner_materials.png"),
     )
 
@@ -202,7 +199,6 @@ def main():
                       render_cell(mol, overrides, f"pre_{key}")))
         print(f"  preset {preset['label']}: done")
     compose_banner(
-        "Presets — from the default High Quality to publication looks",
         cells, columns=3, out_path=str(HERE / "banner_presets.png"),
         cell_size=420,
     )
@@ -219,8 +215,8 @@ def main():
                                          f"rep_{style_key}")))
         print(f"  representation {label}: done")
     compose_banner(
-        "Representations — Publication White preset, every style",
-        cells, columns=3, out_path=str(HERE / "banner_representations.png"),
+        cells, columns=3,
+        out_path=str(HERE / "banner_representations.png"),
         cell_size=420,
     )
 
