@@ -1,26 +1,27 @@
-# Formaldehído — HOMO n(O) y LUMO π*(C=O)
+# Formaldehyde — HOMO n(O) and LUMO π*(C=O)
 
-El par donante–aceptor clásico: el HOMO es el par solitario n del oxígeno (en el plano molecular) y el LUMO el π* del grupo carbonilo. Isovalor ±0.05.
+The classic donor–acceptor pair: the HOMO is the n lone pair on oxygen (in the molecular plane) and the LUMO the π* of the carbonyl group. Isovalue ±0.05, viewed from 45° above.
 
-![HOMO n(O) del formaldehido](render_homo.png)
+![HOMO n(O) of formaldehyde](render_homo.png)
 
-## Contenido de la carpeta
+## Folder contents
 
 * `formaldehyde.inp` / `.out` / `.gbw`
 * `homo.cube` (n), `lumo.cube` (π*)
-* `render_homo.png`, `render_lumo.png` + proyectos `VMD_Renders/`
+* `render_homo.png`, `render_lumo.png` + editable
+  `VMD_Renders/` scene projects
 
-## Paso a paso para reproducir la visualización
+## Step-by-step reproduction guide
 
-### 1 · Cálculo ORCA (B3LYP/def2-SVP, optimización)
+### 1 · ORCA calculation (B3LYP/def2-SVP, geometry optimization)
 
 ```bash
 orca formaldehyde.inp > formaldehyde.out
 ```
 
-### 2 · Extraer el cube
-El HOMO de esta molécula es el orbital `NO = 7` de la tabla ORBITAL
-ENERGIES (convención ORCA); el LUMO es `NO = 8`:
+### 2 · Extract the cube
+The HOMO of this molecule is orbital `NO = 7` in the ORBITAL
+ENERGIES table (ORCA convention); the LUMO is `NO = 8`:
 
 ```bash
 # HOMO
@@ -31,27 +32,27 @@ printf "2\n8\n4\n80 80 80\n11\n12\n" | orca_plot formaldehyde.gbw -i
 mv formaldehyde.mo8a.cube lumo.cube
 ```
 
-(menú: 2 = nº de orbital · 4 = grid 80³ · 11 = generar · 12 = salir)
+(menu: 2 = orbital number · 4 = grid 80³ · 11 = generate · 12 = exit)
 
 
-### 3 · Renderizar con el plugin VMD-Tachyon Export
+### 3 · Render with the VMD-Tachyon Export plugin
 
-1. Abre MoleditPy y carga la geometría o el cube
-   (**Archivo → Abrir** `homo.cube` (isosuperficie auto-activada)).
-2. **Plugins → VMD-Tachyon Export** (o el botón *Export 3D*).
-3. En la pestaña **Volumetric**: ajusta *Isovalue* a ±0.05; luego repite con `lumo.cube`
-4. **Render** → imagen en `VMD_Renders/molecule_00X/output/`.
-   Cada render deja además la escena editable (`scene/scene.tcl`,
-   `scene.vmd`) para retocarla en VMD y volver a renderizar.
+1. Open MoleditPy and load the geometry or the cube file
+   (**File → Open** `homo.cube` (isosurface auto-enabled)).
+2. **Plugins → VMD-Tachyon Export** (or the *Export 3D* button).
+3. In the **Volumetric** tab: set *Isovalue* to ±0.05; then repeat with `lumo.cube`
+4. **Render** → image in `VMD_Renders/molecule_00X/output/`.
+   Each render also produces an editable scene (`scene/scene.tcl`,
+   `scene.vmd`) for further tweaking in VMD.
 
-### Alternativa: un solo comando
+### Quick alternative
 
 ```bash
 <moleditpy-venv>/bin/python examples/generate_examples.py
 ```
-> **Numeración de orbitales**: ORCA (y su herramienta `orca_plot`)
-> numeran los orbitales **desde 0** — el HOMO de una molécula de capa
-> cerrada con 2N electrones aparece como `NO = N-1` en la tabla
-> ORBITAL ENERGIES del `.out`. Multiwfn, en cambio, usa base-1 sobre el
-> archivo molden. Con `orca_plot` usa el número tal como aparece en la
-> tabla de ORCA.
+> **Orbital numbering**: ORCA (and its `orca_plot` tool) number orbitals
+> **from 0** — the HOMO of a closed-shell molecule with 2N electrons
+> appears as `NO = N-1` in the ORBITAL ENERGIES table of the `.out`
+> file. Multiwfn, in contrast, uses 1-based numbering on the molden
+> file. With `orca_plot`, use the number exactly as printed in the
+> ORCA table.

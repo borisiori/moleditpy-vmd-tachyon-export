@@ -1,42 +1,43 @@
-# Agua — dominios de localización electrónica (ELF)
+# Water — electron localization function (ELF) domains
 
-Isosuperficie ELF = 0.8 translúcida (opacidad 0.55): se aislan los dos pares solitarios del oxígeno, los enlaces O–H y los hidrógenos como dominios de localización independientes. ELF calculada con Multiwfn (función 9).
+Translucent ELF = 0.8 isosurface (opacity 0.55): the localization domains isolate the two oxygen lone pairs, the O–H bonds and the hydrogen atoms as independent regions. ELF computed with Multiwfn (function 9), viewed perpendicular to the molecular plane.
 
-![ELF del agua](render_elf.png)
+![ELF domains of water](render_elf.png)
 
-## Contenido de la carpeta
+## Folder contents
 
 * `water.inp` / `.out` / `.gbw`
 * `elf.cube` (Multiwfn)
-* `render_elf.png` + proyecto `VMD_Renders/`
+* `render_elf.png` + editable `VMD_Renders/` project
 
-## Paso a paso para reproducir la visualización
+## Step-by-step reproduction guide
 
-### 1 · Cálculo ORCA (B3LYP/def2-SVP, optimización)
+### 1 · ORCA calculation (B3LYP/def2-SVP, geometry optimization)
 
 ```bash
 orca water.inp > water.out
 ```
 
-### 2 · Extraer el cube
+### 2 · Extract the cube
 ```bash
 orca_2mkl water -molden
 printf "5\n9\n2\n2\n0\nq\n" | Multiwfn water.molden.input
-mv elf.cub elf.cube      # ELF (función 9), grid medio
+mv elf.cub elf.cube      # ELF (function 9), medium grid
 ```
 
 
-### 3 · Renderizar con el plugin VMD-Tachyon Export
+### 3 · Render with the VMD-Tachyon Export plugin
 
-1. Abre MoleditPy y carga la geometría o el cube
-   (**Archivo → Abrir** `elf.cube` (isosuperficie auto-activada)).
-2. **Plugins → VMD-Tachyon Export** (o el botón *Export 3D*).
-3. En la pestaña **Volumetric**: *Isovalue +* **0.8** y *Opacity* **0.55** para ver la molécula dentro de los dominios
-4. **Render** → imagen en `VMD_Renders/molecule_00X/output/`.
-   Cada render deja además la escena editable (`scene/scene.tcl`,
-   `scene.vmd`) para retocarla en VMD y volver a renderizar.
+1. Open MoleditPy and load the geometry or the cube file
+   (**File → Open** `elf.cube` (isosurface auto-enabled)).
+2. **Plugins → VMD-Tachyon Export** (or the *Export 3D* button).
+3. In the **Volumetric** tab: *Isovalue +* **0.8** and *Opacity* **0.55** to see the
+     molecule inside the domains
+4. **Render** → image in `VMD_Renders/molecule_00X/output/`.
+   Each render also produces an editable scene (`scene/scene.tcl`,
+   `scene.vmd`) for further tweaking in VMD.
 
-### Alternativa: un solo comando
+### Quick alternative
 
 ```bash
 <moleditpy-venv>/bin/python examples/generate_examples.py

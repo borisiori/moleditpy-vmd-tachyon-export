@@ -1,46 +1,48 @@
-# Agua — potencial electrostático (MEP)
+# Water — molecular electrostatic potential (MEP)
 
-MEP mapeado sobre la superficie de densidad electrónica ρ = 0.001 a.u. (superficie vdW): azul = negativo alrededor del oxígeno, rojo = positivo sobre los hidrógenos. Escala BWR simétrica ±0.04 a.u.
+MEP mapped on the 0.001 a.u. electron-density surface (van der Waals surface): blue = negative around the oxygen, red = positive on the hydrogens. Symmetric BWR scale ±0.04 a.u., viewed perpendicular to the molecular plane to show both poles.
 
-![MEP del agua](render_mep.png)
+![MEP of water](render_mep.png)
 
-## Contenido de la carpeta
+## Folder contents
 
 * `water.inp` / `.out` / `.gbw`
 * `density.cube` (orca_plot) + `esp.cube` (Multiwfn)
-* `render_mep.png` + proyecto `VMD_Renders/`
+* `render_mep.png` + editable `VMD_Renders/` project
 
-## Paso a paso para reproducir la visualización
+## Step-by-step reproduction guide
 
-### 1 · Cálculo ORCA (B3LYP/def2-SVP, optimización)
+### 1 · ORCA calculation (B3LYP/def2-SVP, geometry optimization)
 
 ```bash
 orca water.inp > water.out
 ```
 
-### 2 · Extraer el cube
+### 2 · Extract the cube
 ```bash
-# cube de densidad (la "forma" de la superficie)
+# density cube (the surface "shape")
 printf "1\n2\n4\n80 80 80\n11\n12\n" | orca_plot water.gbw -i
 mv water.eldens.cube density.cube
-# molden → ESP con Multiwfn (función 12, grid medio, exportar cube)
+# molden -> ESP with Multiwfn (function 12, medium grid, export cube)
 orca_2mkl water -molden
 printf "5\n12\n2\n2\n0\nq\n" | Multiwfn water.molden.input
 mv totesp.cub esp.cube
 ```
 
 
-### 3 · Renderizar con el plugin VMD-Tachyon Export
+### 3 · Render with the VMD-Tachyon Export plugin
 
-1. Abre MoleditPy y carga la geometría o el cube
-   (**Archivo → Abrir** `density.cube` (activa la isosuperficie)).
-2. **Plugins → VMD-Tachyon Export** (o el botón *Export 3D*).
-3. En la pestaña **Volumetric**: *Isovalue +* **0.001**; en **Property Map → Load Map…** elige `esp.cube`, *Scale min/max* **−0.04 / 0.04**, *Colormap* **BWR**
-4. **Render** → imagen en `VMD_Renders/molecule_00X/output/`.
-   Cada render deja además la escena editable (`scene/scene.tcl`,
-   `scene.vmd`) para retocarla en VMD y volver a renderizar.
+1. Open MoleditPy and load the geometry or the cube file
+   (**File → Open** `density.cube` (enables the isosurface)).
+2. **Plugins → VMD-Tachyon Export** (or the *Export 3D* button).
+3. In the **Volumetric** tab: *Isovalue +* **0.001**; under **Property Map → Load
+     Map…** choose `esp.cube`, set *Scale min/max* to
+     **−0.04 / 0.04** and *Colormap* to **BWR**
+4. **Render** → image in `VMD_Renders/molecule_00X/output/`.
+   Each render also produces an editable scene (`scene/scene.tcl`,
+   `scene.vmd`) for further tweaking in VMD.
 
-### Alternativa: un solo comando
+### Quick alternative
 
 ```bash
 <moleditpy-venv>/bin/python examples/generate_examples.py

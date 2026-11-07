@@ -1,43 +1,44 @@
-# Radical metilo — densidad de espín
+# Methyl radical — spin density
 
-Cálculo no restringido (UKS, multiplicidad 2): toda la densidad de espín es α — un solo lobo azul sobre el carbono radicalario, plano como corresponde a un radical de tipo π. Isovalor ±0.002.
+Unrestricted calculation (UKS, multiplicity 2): all the spin density is α — the two blue domes above and below the planar CH₃ framework correspond to the singly occupied p orbital on the radical carbon. Isovalue ±0.002, viewed edge-on to show both lobes.
 
-![Densidad de espín del radical metilo](render_spin.png)
+![Spin density of the methyl radical](render_spin.png)
 
-## Contenido de la carpeta
+## Folder contents
 
-* `methyl_radical.inp` (`UKS`, mult 2) / `.out` / `.gbw`
+* `methyl_radical.inp` (`UKS`, mult 2) / `.out` /
+  `.gbw`
 * `spindens.cube`
-* `render_spin.png` + proyecto `VMD_Renders/`
+* `render_spin.png` + editable `VMD_Renders/` project
 
-## Paso a paso para reproducir la visualización
+## Step-by-step reproduction guide
 
-### 1 · Cálculo ORCA (B3LYP/def2-SVP, optimización)
+### 1 · ORCA calculation (B3LYP/def2-SVP, geometry optimization)
 
 ```bash
 orca methyl_radical.inp > methyl_radical.out
 ```
 
-### 2 · Extraer el cube
+### 2 · Extract the cube
 ```bash
 printf "1\n3\n4\n80 80 80\n11\n12\n" | orca_plot methyl_radical.gbw -i
 mv methyl_radical.spindens.cube spindens.cube
 ```
 
-(menú: 1 = tipo → 3 = densidad de espín SCF)
+(menu: 1 = plot type → 3 = SCF spin density)
 
 
-### 3 · Renderizar con el plugin VMD-Tachyon Export
+### 3 · Render with the VMD-Tachyon Export plugin
 
-1. Abre MoleditPy y carga la geometría o el cube
-   (**Archivo → Abrir** `spindens.cube` (isosuperficie auto-activada)).
-2. **Plugins → VMD-Tachyon Export** (o el botón *Export 3D*).
-3. En la pestaña **Volumetric**: ajusta *Isovalue* a ±0.002; solo el lobo azul (α) aparecerá
-4. **Render** → imagen en `VMD_Renders/molecule_00X/output/`.
-   Cada render deja además la escena editable (`scene/scene.tcl`,
-   `scene.vmd`) para retocarla en VMD y volver a renderizar.
+1. Open MoleditPy and load the geometry or the cube file
+   (**File → Open** `spindens.cube` (isosurface auto-enabled)).
+2. **Plugins → VMD-Tachyon Export** (or the *Export 3D* button).
+3. In the **Volumetric** tab: set *Isovalue* to ±0.002; only the blue (α) dome appears
+4. **Render** → image in `VMD_Renders/molecule_00X/output/`.
+   Each render also produces an editable scene (`scene/scene.tcl`,
+   `scene.vmd`) for further tweaking in VMD.
 
-### Alternativa: un solo comando
+### Quick alternative
 
 ```bash
 <moleditpy-venv>/bin/python examples/generate_examples.py

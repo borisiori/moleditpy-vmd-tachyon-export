@@ -50,7 +50,7 @@
   "auto_fit": true,
   "custom_rot": [
     0.0,
-    0.0,
+    90.0,
     0.0
   ],
   "geometry_source": "current",

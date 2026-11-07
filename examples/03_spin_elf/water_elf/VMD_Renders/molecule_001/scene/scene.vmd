@@ -394,7 +394,7 @@ mol clipplane color  5 2 top {0.5 0.5 0.5 }
 mol clipplane normal 5 2 top {0.0 0.0 1.0}
 mol clipplane status 5 2 top {0}
 mol rename top molecule.psf
-set viewpoints([molinfo top]) {{{1 0 0 0} {0 1 0 -1.66265e-18} {0 0 1 0.273667} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}} {{0.388523 0 0 0} {0 0.388523 0 0} {0 0 0.388523 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
+set viewpoints([molinfo top]) {{{1 0 0 0} {0 1 0 -1.66265e-18} {0 0 1 0.273667} {0 0 0 1}} {{6.12323e-17 0 -1 0} {0 1 0 0} {1 0 6.12323e-17 0} {0 0 0 1}} {{0.388523 0 0 0} {0 0.388523 0 0} {0 0 0.388523 0} {0 0 0 1}} {{1 0 0 0} {0 1 0 0} {0 0 1 0} {0 0 0 1}}}
 lappend viewplist [molinfo top]
 set topmol [molinfo top]
 # done with molecule 0

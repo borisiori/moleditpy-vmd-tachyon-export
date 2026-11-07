@@ -1,46 +1,47 @@
-# Clorometano — MEP con el bolsillo del cloro
+# Chloromethane — MEP with the chlorine pocket
 
-El MEP distingue el bolsillo negativo alrededor del cloro (azul, la repulsión nucleófila) del lado metilo positivo. Escala asimétrica −0.025 / +0.075 a.u. para aprovechar el rango real del potencial.
+The MEP distinguishes the negative pocket around the chlorine (blue, nucleophilic repulsion) from the positive methyl side. Asymmetric scale −0.025 / +0.075 a.u. to exploit the actual range of the potential, viewed perpendicular to the C–Cl axis.
 
-![MEP del clorometano](render_mep.png)
+![MEP of chloromethane](render_mep.png)
 
-## Contenido de la carpeta
+## Folder contents
 
 * `chloromethane.inp` / `.out` / `.gbw`
 * `density.cube` + `esp.cube`
-* `render_mep.png` + proyecto `VMD_Renders/`
+* `render_mep.png` + editable `VMD_Renders/` project
 
-## Paso a paso para reproducir la visualización
+## Step-by-step reproduction guide
 
-### 1 · Cálculo ORCA (B3LYP/def2-SVP, optimización)
+### 1 · ORCA calculation (B3LYP/def2-SVP, geometry optimization)
 
 ```bash
 orca chloromethane.inp > chloromethane.out
 ```
 
-### 2 · Extraer el cube
+### 2 · Extract the cube
 ```bash
-# cube de densidad (la "forma" de la superficie)
+# density cube (the surface "shape")
 printf "1\n2\n4\n80 80 80\n11\n12\n" | orca_plot chloromethane.gbw -i
 mv chloromethane.eldens.cube density.cube
-# molden → ESP con Multiwfn (función 12, grid medio, exportar cube)
+# molden -> ESP with Multiwfn (function 12, medium grid, export cube)
 orca_2mkl chloromethane -molden
 printf "5\n12\n2\n2\n0\nq\n" | Multiwfn chloromethane.molden.input
 mv totesp.cub esp.cube
 ```
 
 
-### 3 · Renderizar con el plugin VMD-Tachyon Export
+### 3 · Render with the VMD-Tachyon Export plugin
 
-1. Abre MoleditPy y carga la geometría o el cube
-   (**Archivo → Abrir** `density.cube` (activa la isosuperficie)).
-2. **Plugins → VMD-Tachyon Export** (o el botón *Export 3D*).
-3. En la pestaña **Volumetric**: *Isovalue +* **0.001**; **Load Map…** `esp.cube`, *min/max* **−0.025 / 0.075**, **BWR**
-4. **Render** → imagen en `VMD_Renders/molecule_00X/output/`.
-   Cada render deja además la escena editable (`scene/scene.tcl`,
-   `scene.vmd`) para retocarla en VMD y volver a renderizar.
+1. Open MoleditPy and load the geometry or the cube file
+   (**File → Open** `density.cube` (enables the isosurface)).
+2. **Plugins → VMD-Tachyon Export** (or the *Export 3D* button).
+3. In the **Volumetric** tab: *Isovalue +* **0.001**; **Load Map…** `esp.cube`,
+     *min/max* **−0.025 / 0.075**, **BWR**
+4. **Render** → image in `VMD_Renders/molecule_00X/output/`.
+   Each render also produces an editable scene (`scene/scene.tcl`,
+   `scene.vmd`) for further tweaking in VMD.
 
-### Alternativa: un solo comando
+### Quick alternative
 
 ```bash
 <moleditpy-venv>/bin/python examples/generate_examples.py

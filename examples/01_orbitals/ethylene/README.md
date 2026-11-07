@@ -1,26 +1,27 @@
-# Etileno — orbitales HOMO (π) y LUMO (π*)
+# Ethylene — HOMO (π) and LUMO (π*)
 
-El par textbook de orbitales de frontera: el HOMO π enlazante (dos lóbulos, un nodo en el plano molecular) y el LUMO π* antienlazante (nodo adicional entre los carbonos). Lóbulo positivo azul, negativo rojo, isovalor ±0.05.
+The textbook frontier-orbital pair: the bonding HOMO π (two lobes sharing the region between the carbons) and the antibonding LUMO π* (an extra node between them). Positive lobe blue, negative red, isovalue ±0.05, viewed from 45° above the molecular plane.
 
-![HOMO pi del etileno](render_homo.png)
+![HOMO pi of ethylene](render_homo.png)
 
-## Contenido de la carpeta
+## Folder contents
 
 * `ethylene.inp` / `ethylene.out` / `ethylene.gbw`
-* `homo.cube`, `lumo.cube` (orca_plot, grid 80³)
-* `render_homo.png`, `render_lumo.png` + proyectos `VMD_Renders/`
+* `homo.cube`, `lumo.cube` (orca_plot, 80³ grid)
+* `render_homo.png`, `render_lumo.png` + editable
+  `VMD_Renders/` scene projects
 
-## Paso a paso para reproducir la visualización
+## Step-by-step reproduction guide
 
-### 1 · Cálculo ORCA (B3LYP/def2-SVP, optimización)
+### 1 · ORCA calculation (B3LYP/def2-SVP, geometry optimization)
 
 ```bash
 orca ethylene.inp > ethylene.out
 ```
 
-### 2 · Extraer el cube
-El HOMO de esta molécula es el orbital `NO = 7` de la tabla ORBITAL
-ENERGIES (convención ORCA); el LUMO es `NO = 8`:
+### 2 · Extract the cube
+The HOMO of this molecule is orbital `NO = 7` in the ORBITAL
+ENERGIES table (ORCA convention); the LUMO is `NO = 8`:
 
 ```bash
 # HOMO
@@ -31,27 +32,29 @@ printf "2\n8\n4\n80 80 80\n11\n12\n" | orca_plot ethylene.gbw -i
 mv ethylene.mo8a.cube lumo.cube
 ```
 
-(menú: 2 = nº de orbital · 4 = grid 80³ · 11 = generar · 12 = salir)
+(menu: 2 = orbital number · 4 = grid 80³ · 11 = generate · 12 = exit)
 
 
-### 3 · Renderizar con el plugin VMD-Tachyon Export
+### 3 · Render with the VMD-Tachyon Export plugin
 
-1. Abre MoleditPy y carga la geometría o el cube
-   (**Archivo → Abrir** `homo.cube` — el plugin detecta que es un cube y activa la isosuperficie automáticamente).
-2. **Plugins → VMD-Tachyon Export** (o el botón *Export 3D*).
-3. En la pestaña **Volumetric**: verifica *Isovalue +* **0.05** / *−* **−0.05** y los colores azul/rojo; repite con `lumo.cube` para el LUMO
-4. **Render** → imagen en `VMD_Renders/molecule_00X/output/`.
-   Cada render deja además la escena editable (`scene/scene.tcl`,
-   `scene.vmd`) para retocarla en VMD y volver a renderizar.
+1. Open MoleditPy and load the geometry or the cube file
+   (**File → Open** `homo.cube` — the plugin detects it as volumetric data and
+  enables the isosurface automatically).
+2. **Plugins → VMD-Tachyon Export** (or the *Export 3D* button).
+3. In the **Volumetric** tab: check *Isovalue +* **0.05** / *−* **−0.05** and the
+     blue/red colors; repeat with `lumo.cube` for the LUMO
+4. **Render** → image in `VMD_Renders/molecule_00X/output/`.
+   Each render also produces an editable scene (`scene/scene.tcl`,
+   `scene.vmd`) for further tweaking in VMD.
 
-### Alternativa: un solo comando
+### Quick alternative
 
 ```bash
 <moleditpy-venv>/bin/python examples/generate_examples.py
 ```
-> **Numeración de orbitales**: ORCA (y su herramienta `orca_plot`)
-> numeran los orbitales **desde 0** — el HOMO de una molécula de capa
-> cerrada con 2N electrones aparece como `NO = N-1` en la tabla
-> ORBITAL ENERGIES del `.out`. Multiwfn, en cambio, usa base-1 sobre el
-> archivo molden. Con `orca_plot` usa el número tal como aparece en la
-> tabla de ORCA.
+> **Orbital numbering**: ORCA (and its `orca_plot` tool) number orbitals
+> **from 0** — the HOMO of a closed-shell molecule with 2N electrons
+> appears as `NO = N-1` in the ORBITAL ENERGIES table of the `.out`
+> file. Multiwfn, in contrast, uses 1-based numbering on the molden
+> file. With `orca_plot`, use the number exactly as printed in the
+> ORCA table.

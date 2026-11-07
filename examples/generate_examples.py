@@ -230,12 +230,16 @@ def example_orbital(folder, name, charge, mult, geometry):
     homo = parse_homo(stem.with_suffix(".out"))
     mol = mol_from_xyz(folder / f"{name}.xyz", charge)
     images = []
+    views = {"homo": [45.0, 0.0, 0.0],   # 45 deg from above, straight-on
+             "lumo": [45.0, 0.0, 0.0]}   # same angle for the pi* pair
     for label, mo in (("homo", homo), ("lumo", homo + 1)):
         cube = cube_from_orca_plot(stem.with_suffix(".gbw"), folder,
                                    "mo", mo=mo)
         cube.rename(folder / f"{label}.cube")
         png, project = render(folder, mol, {
             "preset": "custom",
+            "camera": "custom", "custom_rot": views[label],
+            "fit_margin": 1.55,
             "cube": {"enabled": True,
                      "path": str(folder / f"{label}.cube"),
                      "iso_pos": 0.05, "iso_neg": -0.05},
@@ -273,7 +277,7 @@ def example_mep(folder, name, charge, mult, geometry, esp_span=None,
     return [gallery_copy(png, folder, "render_mep")], [_project]
 
 
-def example_spin(folder, name, charge, mult, geometry):
+def example_spin(folder, name, charge, mult, geometry, view=None):
     folder.mkdir(parents=True, exist_ok=True)
     inp = write_inp(folder, name, charge, mult, geometry)
     print(f"  ORCA {name} ...")
@@ -291,7 +295,7 @@ def example_spin(folder, name, charge, mult, geometry):
     return [gallery_copy(png, folder, "render_spin")], [_project]
 
 
-def example_elf(folder, name, charge, mult, geometry):
+def example_elf(folder, name, charge, mult, geometry, view=None):
     folder.mkdir(parents=True, exist_ok=True)
     inp = write_inp(folder, name, charge, mult, geometry)
     print(f"  ORCA {name} ...")
@@ -301,12 +305,16 @@ def example_elf(folder, name, charge, mult, geometry):
     elf = cube_from_multiwfn(molden, folder, "elf")
     elf.rename(folder / "elf.cube")
     mol = mol_from_xyz(folder / f"{name}.xyz", charge)
-    png, _project = render(folder, mol, {
+    overrides = {
         "preset": "custom",
         "cube": {"enabled": True, "path": str(folder / "elf.cube"),
                  "iso_pos": 0.8,          # localization domains
                  "opacity": 0.55},        # molecule visible inside
-    })
+    }
+    if view:
+        overrides["camera"] = "custom"
+        overrides["custom_rot"] = list(view)
+    png, _project = render(folder, mol, overrides)
     return [gallery_copy(png, folder, "render_elf")], [_project]
 
 
@@ -390,12 +398,14 @@ def main():
         ("01_orbitals/formaldehyde", example_orbital, "formaldehyde", {}),
         ("02_mep/water", example_mep, "water",
          {"esp_low": -0.04, "esp_high": 0.04,
-          "view": (55.0, 0.0, 35.0)}),
+          "view": (0.0, 90.0, 0.0)}),
         ("02_mep/chloromethane", example_mep, "chloromethane",
          {"esp_low": -0.025, "esp_high": 0.075,
-          "view": (50.0, 15.0, -150.0)}),
-        ("03_spin_elf/methyl_radical", example_spin, "methyl_radical", {}),
-        ("03_spin_elf/water_elf", example_elf, "water", {}),
+          "view": (0.0, 90.0, 0.0)}),
+        ("03_spin_elf/methyl_radical", example_spin, "methyl_radical",
+         {"view": (90.0, 0.0, 0.0)}),
+        ("03_spin_elf/water_elf", example_elf, "water",
+         {"view": (0.0, 90.0, 0.0)}),
     ]
     kept_projects = []
     for relative, builder, molecule, extra in jobs:

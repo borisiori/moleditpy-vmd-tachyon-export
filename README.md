@@ -174,6 +174,23 @@ GNU Lesser General Public License v3.0 or later
 (LGPL-3.0-or-later) — the same license as MoleditPy. See
 [LICENSE](LICENSE) and [COPYING](COPYING).
 
+## References
+
+If you use these tools in your research, please cite the original
+works:
+
+* **MoleditPy**: H. Yokoyama, *MoleditPy — A Python-based molecular
+  editing software*, DOI: [10.5281/zenodo.17268532](https://doi.org/10.5281/zenodo.17268532)
+* **VMD**: W. Humphrey, A. Dalke and K. Schulten, "VMD — Visual
+  Molecular Dynamics", *J. Mol. Graphics* **1996**, *14*, 33–38.
+  DOI: [10.1016/0263-7855(96)00018-5](https://doi.org/10.1016/0263-7855(96)00018-5)
+* **ORCA** (used in the examples): F. Neese, "Software update: the ORCA
+  program system, version 5.0", *WIREs Comput. Mol. Sci.* **2022**, *12*,
+  e1606. DOI: [10.1002/wcms.1606](https://doi.org/10.1002/wcms.1606)
+* **Multiwfn** (used in the examples): T. Lu and F. Chen, "Multifunctional
+  wavefunction analyzer", *J. Comput. Chem.* **2012**, *33*, 580–592.
+  DOI: [10.1002/jcc.22885](https://doi.org/10.1002/jcc.22885)
+
 ## Acknowledgments
 
 Built for [MoleditPy](https://github.com/HiroYokoyama/MoleditPy) by
