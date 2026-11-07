@@ -19,7 +19,7 @@ Engine: tachyon (external Tachyon (exact resolution))
 
 ## Open and edit in VMD (GUI)
 
-    cd /home/borisiori/.moleditpy/vmd_tachyon_export_project/examples/03_spin_elf/methyl_radical/VMD_Renders/molecule_001
+    cd examples/03_spin_elf/methyl_radical/VMD_Renders/molecule_001
     /home/borisiori/Programas/VMD/bin/vmd -e scene/scene.vmd
 
 Rotate, change materials, representations, isosurfaces, lighting ...

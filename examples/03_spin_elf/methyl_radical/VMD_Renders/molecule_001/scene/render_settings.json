@@ -43,13 +43,13 @@
   "format": "png",
   "aasamples": 24,
   "transparent": false,
-  "preset": "custom",
+  "preset": "high_quality",
   "camera": "custom",
   "match_moleditpy": false,
   "auto_center": true,
   "auto_fit": true,
   "custom_rot": [
-    0.0,
+    90.0,
     0.0,
     0.0
   ],
@@ -58,12 +58,12 @@
   "use_connectivity": true,
   "cube": {
     "enabled": true,
-    "path": "/home/borisiori/.moleditpy/vmd_tachyon_export_project/examples/03_spin_elf/methyl_radical/spindens.cube",
+    "path": "examples/03_spin_elf/methyl_radical/spindens.cube",
     "iso_pos": 0.002,
     "iso_neg": -0.002,
     "interpretation": "spin_density"
   },
-  "output_root": "/home/borisiori/.moleditpy/vmd_tachyon_export_project/examples/03_spin_elf/methyl_radical/VMD_Renders",
+  "output_root": "examples/03_spin_elf/methyl_radical/VMD_Renders",
   "project_name": "",
   "fit_margin": 1.55,
   "_natoms": 4

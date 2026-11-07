@@ -286,12 +286,16 @@ def example_spin(folder, name, charge, mult, geometry, view=None):
     spin = cube_from_orca_plot(stem.with_suffix(".gbw"), folder, "spin")
     spin.rename(folder / "spindens.cube")
     mol = mol_from_xyz(folder / f"{name}.xyz", charge)
-    png, _project = render(folder, mol, {
+    overrides = {
         "preset": "custom",
         "cube": {"enabled": True,
                  "path": str(folder / "spindens.cube"),
                  "iso_pos": 0.002, "iso_neg": -0.002},
-    })
+    }
+    if view:
+        overrides["camera"] = "custom"
+        overrides["custom_rot"] = list(view)
+    png, _project = render(folder, mol, overrides)
     return [gallery_copy(png, folder, "render_spin")], [_project]
 
 
