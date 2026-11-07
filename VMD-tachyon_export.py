@@ -2798,13 +2798,15 @@ def _build_dialog_class():
             self.tabs.addTab(self._build_volumetric_tab(), "Volumetric")
             self.tabs.addTab(self._build_output_tab(), "Output")
             root.addWidget(self.tabs, 1)
-            root.addWidget(self._build_render_bar())
             self.results_group = self._build_results_group()
             root.addWidget(self.results_group)
             scroll.setWidget(content)
             outer = QVBoxLayout(self)
             outer.setContentsMargins(4, 4, 4, 4)
-            outer.addWidget(scroll)
+            outer.addWidget(scroll, 1)
+            # The render bar stays OUTSIDE the scroll area so the
+            # Render button is always visible without scrolling
+            outer.addWidget(self._build_render_bar())
 
             self._apply_settings_to_ui()
             self.preset_combo.currentIndexChanged.connect(self._apply_preset)
