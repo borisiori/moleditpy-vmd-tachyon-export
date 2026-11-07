@@ -4081,11 +4081,31 @@ def _build_dialog_class():
             # Restore pruned volumetric files before opening
             self._restore_pruned_cubes(project)
 
-            subprocess.Popen(
-                [self.installation.vmd_path, "-e", "scene/scene.vmd"],
-                cwd=str(project),
-                start_new_session=True,
-            )
+            # VMD exits when its stdin reaches EOF (verified: launching
+            # from a desktop app inherits /dev/null -> VMD quits right
+            # after loading the scene). Fix: run it inside a
+            # pseudo-terminal so stdin never EOFs, detached from this
+            # process. `script` (util-linux) allocates the pty on Linux;
+            # macOS script takes the command as trailing args; the
+            # Windows GUI binary does not read stdin this way.
+            if sys.platform == "win32":
+                subprocess.Popen(
+                    [self.installation.vmd_path, "-e", "scene/scene.vmd"],
+                    cwd=str(project),
+                )
+            elif sys.platform == "darwin":
+                subprocess.Popen(
+                    ["script", "-q", "/dev/null",
+                     self.installation.vmd_path, "-e", "scene/scene.vmd"],
+                    cwd=str(project), start_new_session=True,
+                )
+            else:  # Linux
+                subprocess.Popen(
+                    ["script", "-qec",
+                     f'"{self.installation.vmd_path}" '
+                     f'-e scene/scene.vmd', "/dev/null"],
+                    cwd=str(project), start_new_session=True,
+                )
 
         def _restore_pruned_cubes(self, project):
             """Copy cube files back into volumetric/ if they were pruned
