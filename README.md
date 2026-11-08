@@ -1,5 +1,7 @@
 # VMD-Tachyon Export — MoleditPy Plugin
 
+[![Tests](https://github.com/borisiori/moleditpy-vmd-tachyon-export/actions/workflows/tests.yml/badge.svg)](https://github.com/borisiori/moleditpy-vmd-tachyon-export/actions/workflows/tests.yml)
+
 Render the current MoleditPy molecule — and Gaussian cube data — with
 your **local VMD installation** through the **Tachyon** ray-tracing
 engine. Every render produces a publication-quality image **plus a

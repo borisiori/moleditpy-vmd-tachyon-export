@@ -97,6 +97,8 @@ def test_plugin_metadata(vmd):
 
 
 def test_loads_through_real_plugin_manager(vmd):
+    pytest.importorskip(
+        "moleditpy", reason="moleditpy not installable on this platform")
     from moleditpy.plugins.plugin_manager import PluginManager
 
     tmp = tempfile.mkdtemp(prefix="vmd_plugin_test_")
