@@ -679,7 +679,7 @@ def test_vmd_render_size_multiples_of_16(vmd):
 
 def test_platform_helpers_linux(vmd, monkeypatch):
     monkeypatch.setattr(sys, "platform", "linux")
-    roots = [str(r) for r in vmd._vmd_search_roots()]
+    roots = [r.as_posix() for r in vmd._vmd_search_roots()]
     assert any("/opt" in r for r in roots)
     assert "bin/vmd" in vmd._vmd_launcher_suffixes()
     assert "/usr/bin/vmd" in vmd._plain_vmd_paths()
@@ -689,7 +689,7 @@ def test_platform_helpers_linux(vmd, monkeypatch):
 def test_platform_helpers_windows(vmd, monkeypatch):
     monkeypatch.setattr(sys, "platform", "win32")
     monkeypatch.setenv("ProgramFiles", r"C:\Program Files")
-    roots = [str(r) for r in vmd._vmd_search_roots()]
+    roots = [r.as_posix() for r in vmd._vmd_search_roots()]
     assert any("Program Files" in r for r in roots)
     suffixes = vmd._vmd_launcher_suffixes()
     assert "vmd.exe" in suffixes and all(".exe" in s for s in suffixes)
@@ -704,7 +704,7 @@ def test_platform_helpers_windows(vmd, monkeypatch):
 
 def test_platform_helpers_macos(vmd, monkeypatch):
     monkeypatch.setattr(sys, "platform", "darwin")
-    roots = [str(r) for r in vmd._vmd_search_roots()]
+    roots = [r.as_posix() for r in vmd._vmd_search_roots()]
     assert any(r.startswith("/Applications") for r in roots)
     assert any("homebrew" in r for r in roots)
     suffixes = vmd._vmd_launcher_suffixes()
