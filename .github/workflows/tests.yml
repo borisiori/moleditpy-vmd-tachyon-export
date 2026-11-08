@@ -11,7 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.11']
+        python-version: ['3.12']
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -39,4 +39,4 @@ jobs:
       - name: Run unit tests
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -m pytest tests/test_vmd_tachyon_export.py -v
+        run: python -m pytest tests/test_vmd_tachyon_export.py -v --tb=long
