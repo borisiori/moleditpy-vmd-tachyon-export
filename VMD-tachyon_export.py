@@ -51,6 +51,7 @@ PLUGIN_DESCRIPTION = (
 )
 PLUGIN_DEPENDENCIES = ["PySide6-Essentials", "numpy"]
 PLUGIN_SUPPORTED_MOLEDITPY_VERSION = ">=5.0.0, <6.0.0"
+PLUGIN_SUPPORTED_PYTHON_VERSION = ">=3.12, <3.15"
 # No PLUGIN_SUPPORTED_OS: the plugin is not OS-restricted (the registry
 # expects that constant only for restricted plugins). VMD itself is an
 # external program available for Linux, Windows and macOS.
