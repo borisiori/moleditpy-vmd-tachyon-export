@@ -106,27 +106,19 @@ images and a step-by-step guide.
 **[🖼️ View the complete gallery →](examples/README.md)** — every image
 below opens at full resolution when clicked.
 
-### Orbitals, MEP and spin density (ORCA + Multiwfn)
-
-| Example | Render | Guide |
+| Example | Analysis | Render (click to enlarge) |
 |---|---|---|
-| Ethylene — HOMO π | [![HOMO π](examples/01_orbitals/ethylene/render_homo.png)](examples/01_orbitals/ethylene/render_homo.png) | [guide](examples/01_orbitals/ethylene/README.md) |
-| Ethylene — LUMO π* | [![LUMO π*](examples/01_orbitals/ethylene/render_lumo.png)](examples/01_orbitals/ethylene/render_lumo.png) | [guide](examples/01_orbitals/ethylene/README.md) |
-| Formaldehyde — HOMO n(O) | [![HOMO n(O)](examples/01_orbitals/formaldehyde/render_homo.png)](examples/01_orbitals/formaldehyde/render_homo.png) | [guide](examples/01_orbitals/formaldehyde/README.md) |
-| Chloromethane — MEP | [![MEP](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png) | [guide](examples/02_mep/chloromethane/README.md) |
-| Methyl radical — spin | [![Spin](examples/03_spin_elf/methyl_radical/render_spin.png)](examples/03_spin_elf/methyl_radical/render_spin.png) | [guide](examples/03_spin_elf/methyl_radical/README.md) |
+| Ethylene — HOMO π | Orbital | [![HOMO π](examples/01_orbitals/ethylene/render_homo.png)](examples/01_orbitals/ethylene/render_homo.png) |
+| Formaldehyde — LUMO π* | Orbital | [![LUMO π*](examples/01_orbitals/formaldehyde/render_lumo.png)](examples/01_orbitals/formaldehyde/render_lumo.png) |
+| Chloromethane | MEP | [![MEP](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png) |
+| Methyl radical | Spin density | [![Spin](examples/03_spin_elf/methyl_radical/render_spin.png)](examples/03_spin_elf/methyl_radical/render_spin.png) |
+| Water | ELF | [![ELF](examples/03_spin_elf/water_elf/render_elf.png)](examples/03_spin_elf/water_elf/render_elf.png) |
+| Phenol dimer | NCI | [![NCI](assets/examples/example_nci.png)](assets/examples/example_nci.png) |
+| Phenol dimer | QTAIM | [![QTAIM](assets/examples/example_qtaim.png)](assets/examples/example_qtaim.png) |
+| Phenol | Dual Descriptor | [![DD](assets/examples/example_dd.png)](assets/examples/example_dd.png) |
 
-### NCI, QTAIM, MEP and ELF (Multiwfn Analysis Studio)
-
-| Analysis | Render | Notes |
-|---|---|---|
-| NCI — phenol dimer | [![NCI phenol dimer](assets/examples/example_nci.png)](assets/examples/example_nci.png) | RDG isosurface colored by sign(λ₂)ρ (BGR) |
-| QTAIM — phenol dimer | [![QTAIM phenol dimer](assets/examples/example_qtaim.png)](assets/examples/example_qtaim.png) | BCPs (green), RCPs (red), bond paths (gray) |
-| MEP — chloromethane | [![MEP](assets/examples/example_esp.png)](assets/examples/example_esp.png) | ESP on density surface (BWR, Diffuse) |
-| ELF — water | [![ELF](assets/examples/example_elf.png)](assets/examples/example_elf.png) | Localization domains (translucent) |
-
-Also inside: the [quickstart](examples/00_quickstart/README.md)
-and a generator script that re-runs the gallery.
+Step-by-step guides for the ORCA/Multiwfn examples live in
+[`examples/`](examples/README.md).
 
 ## Requirements
 
