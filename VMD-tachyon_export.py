@@ -1177,10 +1177,12 @@ STUDY_TYPES = {
         "map_colormap": "BWR", "map_low": -0.05, "map_high": 0.05,
         "map_range_set": True,
         "opacity": 0.65,
+        "cube_material": "Diffuse",
         "hint": ("0.001 a.u. density surface with ESP coloring: "
                  "blue = electron-rich (nucleophilic), "
                  "red = electron-poor (electrophilic). "
-                 "Range ±0.05; adjust for your system."),
+                 "Range ±0.05; adjust for your system. "
+                 "Matte material (Diffuse) for readable colors."),
     },
     "elf": {
         "label": "ELF localization domains",
@@ -4023,6 +4025,9 @@ def _build_dialog_class():
                                        cfg["neg_color"])
             if "opacity" in cfg:
                 self.cube_opacity.setValue(cfg["opacity"])
+            if "cube_material" in cfg:
+                self._select_text(self.cube_material,
+                                  cfg["cube_material"])
             if "map_colormap" in cfg:
                 self._select_text(self.map_colormap,
                                   cfg["map_colormap"])
