@@ -1142,6 +1142,11 @@ STUDY_TYPES = {
     "auto": {
         "label": "Auto-detect (from cube header)",
     },
+    "normal": {
+        "label": "Normal (molecule only)",
+        "hint": "Renders the molecule drawn in MoleditPy — no cube, "
+                "no critical points, just a clean publication image.",
+    },
     "nci": {
         "label": "NCI / RDG",
         "iso_pos": 0.5, "show_neg": False,
@@ -2376,8 +2381,12 @@ def prepare_project(context, settings, installation, log):
     # ---- volumetric data --------------------------------------------------
     cube_header, cube_range = None, None
     cube = dict(settings.get("cube") or {})
+    study_type = settings.get("cube", {}).get("study_type", "auto")
     has_qtaim = bool(settings.get("qtaim_cps_path")
                      and settings.get("qtaim_paths_path"))
+    if study_type == "normal":
+        cube["enabled"] = False
+        has_qtaim = False
     if not cube.get("path") and has_qtaim:
         # QTAIM mode: PDB files for critical points and bond paths —
         # no cube is needed, skip the auto-association entirely
@@ -4182,10 +4191,15 @@ def _build_dialog_class():
             cfg = STUDY_TYPES[key]
             self.study_hint.setText(cfg.get("hint", ""))
             # QTAIM works with PDB files, not cubes — don't force-enable
-            if key != "qtaim" and not self.cube_enabled.isChecked():
-                self.cube_enabled.setChecked(True)
-            elif key == "qtaim":
+            if key in ("qtaim", "normal"):
                 self.cube_enabled.setChecked(False)
+            elif not self.cube_enabled.isChecked():
+                self.cube_enabled.setChecked(True)
+            if key == "normal":
+                self.cube_edit.clear()
+                self.cube_map_edit.clear()
+                self.qtaim_cps_edit.clear()
+                self.qtaim_paths_edit.clear()
             if "iso_pos" in cfg:
                 self.iso_pos.setValue(cfg["iso_pos"])
                 self.iso_neg.setValue(-cfg["iso_pos"])

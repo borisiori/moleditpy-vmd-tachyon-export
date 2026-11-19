@@ -59,6 +59,7 @@ community-standard values for each analysis — no manual tweaking:
 
 | Analysis | Isovalue | Lobes | Coloring | Notes |
 |---|---|---|---|---|
+| **Normal** | — | — | — | renders the molecule only (clean publication image) |
 | **NCI / RDG** | 0.5 | positive only | BGR ±0.05 | sign(λ₂)ρ as Property Map; blue=attractive, green=vdW, red=steric |
 | **Fukui** | ±0.005 | dual (blue/red) | — | nucleophilic / electrophilic |
 | **Dual Descriptor** | ±0.005 | dual (blue/red) | — | Δf = f+ − f− |
