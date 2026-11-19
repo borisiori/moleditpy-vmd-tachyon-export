@@ -1169,7 +1169,7 @@ STUDY_TYPES = {
         "label": "QTAIM (CPs + bond paths)",
         "hint": ("Load CPs.pdb and paths.pdb from Multiwfn. "
                  "BCPs green, RCPs red, CCPs yellow, paths gray."),
-        "cp_radius": 0.4,
+        "cp_radius": 0.1,
         "path_style": "Lines",
     },
     "orbital": {
@@ -1186,8 +1186,7 @@ STUDY_TYPES = {
         "opacity": 0.65,
         "cube_material": "Diffuse",
         "hint": ("Load the ESP cube as Property Map for coloring: "
-                 "blue = electron-rich (nucleophilic), "
-                 "red = electron-poor (electrophilic). "
+                 "blue = electron-rich, red = electron-poor. "
                  "Range ±0.05; adjust for your system."),
     },
     "elf": {
@@ -1555,7 +1554,7 @@ def _qtaim_tcl(settings):
     if not cps or not paths:
         return []
 
-    cp_rad = float(settings.get("qtaim_cp_radius", 0.4))
+    cp_rad = float(settings.get("qtaim_cp_radius", 0.1))
     lines = []
     lines.append("# --- QTAIM: critical points and bond paths ---")
 
@@ -3168,7 +3167,7 @@ def _build_dialog_class():
             self.qtaim_cp_radius = QDoubleSpinBox()
             self.qtaim_cp_radius.setRange(0.05, 2.0)
             self.qtaim_cp_radius.setSingleStep(0.05)
-            self.qtaim_cp_radius.setValue(0.4)
+            self.qtaim_cp_radius.setValue(0.1)
             files_grid.addWidget(QLabel("CP radius (Å):"), 2, 0)
             files_grid.addWidget(self.qtaim_cp_radius, 2, 1)
             grid.addWidget(files, 1, 0, 1, 2)
@@ -3909,7 +3908,7 @@ def _build_dialog_class():
             self.qtaim_cps_edit.setText(s.get("qtaim_cps_path", ""))
             self.qtaim_paths_edit.setText(s.get("qtaim_paths_path", ""))
             self.qtaim_cp_radius.setValue(
-                float(s.get("qtaim_cp_radius", 0.4)))
+                float(s.get("qtaim_cp_radius", 0.1)))
             self.show_molecule_check.setChecked(bool(cube.get("show_molecule", True)))
             self.cube_map_edit.setText(cube.get("map_path", ""))
             self.map_low.setValue(float(cube.get("map_low", -0.03)))
