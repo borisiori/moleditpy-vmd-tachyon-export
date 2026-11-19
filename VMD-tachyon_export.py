@@ -2377,7 +2377,13 @@ def prepare_project(context, settings, installation, log):
     # ---- volumetric data --------------------------------------------------
     cube_header, cube_range = None, None
     cube = dict(settings.get("cube") or {})
-    if not cube.get("path"):
+    has_qtaim = bool(settings.get("qtaim_cps_path")
+                     and settings.get("qtaim_paths_path"))
+    if not cube.get("path") and has_qtaim:
+        # QTAIM mode: PDB files for critical points and bond paths —
+        # no cube is needed, skip the auto-association entirely
+        cube["enabled"] = False
+    if not cube.get("path") and not has_qtaim:
         # Auto-association: when the molecule itself comes from a cube file
         # (opened in MoleditPy or loaded as external geometry), that same
         # file IS the volumetric data — the isosurface is expected without
@@ -4176,8 +4182,11 @@ def _build_dialog_class():
                 return
             cfg = STUDY_TYPES[key]
             self.study_hint.setText(cfg.get("hint", ""))
-            if not self.cube_enabled.isChecked():
+            # QTAIM works with PDB files, not cubes — don't force-enable
+            if key != "qtaim" and not self.cube_enabled.isChecked():
                 self.cube_enabled.setChecked(True)
+            elif key == "qtaim":
+                self.cube_enabled.setChecked(False)
             if "iso_pos" in cfg:
                 self.iso_pos.setValue(cfg["iso_pos"])
                 self.iso_neg.setValue(-cfg["iso_pos"])
