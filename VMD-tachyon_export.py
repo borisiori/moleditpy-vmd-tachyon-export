@@ -41,7 +41,7 @@ from pathlib import Path
 
 # ------------------------------------------------------------------ metadata
 PLUGIN_NAME = "VMD-Tachyon Export"
-PLUGIN_VERSION = "2026.11.07"
+PLUGIN_VERSION = "2026.11.19"
 PLUGIN_AUTHOR = "borisiori"
 PLUGIN_LICENSE = "LGPL-3.0-or-later"
 PLUGIN_DESCRIPTION = (

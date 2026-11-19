@@ -1,6 +1,6 @@
 # Changelog
 
-## Development (unreleased)
+## 2026.11.19
 
 ### Analysis Type presets
 
