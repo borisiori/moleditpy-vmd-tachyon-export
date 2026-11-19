@@ -1087,6 +1087,8 @@ def guess_cube_interpretation(header):
         ("nci_rdg", ("reduced density gradient", "rdg",)),
         ("nci_sign_lambda2", ("sign(lambda2)", "sign(lambda2)rho",
                               "sign of lambda2")),
+        ("dual_descriptor", ("dual descriptor", "dual_descriptor",
+                             "delta f", "Δf")),
         ("homo", ("homo", "highest occupied")),
         ("lumo", ("lumo", "lowest unoccupied")),
         ("spin_density", ("spin density", "spin density", "spindens")),
@@ -1155,6 +1157,14 @@ STUDY_TYPES = {
         "pos_color": "#1e90ff", "neg_color": "#e81717",
         "hint": "Two lobes (nucleophilic/electrophilic) at ±0.005.",
     },
+    "dual_descriptor": {
+        "label": "Dual descriptor (Δf = f+ − f−)",
+        "iso_pos": 0.005, "show_neg": True,
+        "pos_color": "#1e90ff", "neg_color": "#e81717",
+        "hint": ("Δf > 0 (blue) = nucleophilic sites; "
+                 "Δf < 0 (red) = electrophilic sites; "
+                 "isovalue ±0.005."),
+    },
     "orbital": {
         "label": "Molecular orbital (HOMO / LUMO)",
         "iso_pos": 0.05, "show_neg": True,
@@ -1196,6 +1206,7 @@ _INTERPRETATION_TO_STUDY = {
     "nci_rdg": "nci",
     "nci_sign_lambda2": "nci",
     "fukui": "fukui",
+    "dual_descriptor": "dual_descriptor",
     "orbital": "orbital",
     "homo": "orbital",
     "lumo": "orbital",
@@ -2359,6 +2370,7 @@ def prepare_project(context, settings, installation, log):
             reverse = {
                 "nci": "nci_rdg",
                 "fukui": "fukui",
+                "dual_descriptor": "dual_descriptor",
                 "orbital": "orbital",
                 "mep": "potential",
                 "elf": "other",
@@ -3379,7 +3391,9 @@ def _build_dialog_class():
                 ("nci_sign_lambda2", "NCI sign(λ₂)ρ (color map)"),
                 ("homo", "HOMO"), ("lumo", "LUMO"),
                 ("density", "Electron density"), ("spin_density", "Spin density"),
-                ("fukui", "Fukui function"), ("orbital", "Molecular orbital"),
+                ("fukui", "Fukui function"),
+                ("dual_descriptor", "Dual descriptor"),
+                ("orbital", "Molecular orbital"),
                 ("potential", "Potential (MEP/ESP)"), ("other", "Other"),
             ):
                 self.cube_interpretation.addItem(label, key)
