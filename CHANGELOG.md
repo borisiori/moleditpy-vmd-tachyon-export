@@ -1,5 +1,44 @@
 # Changelog
 
+## Development (unreleased)
+
+### Analysis Type presets
+
+A dropdown next to the visual preset now configures scientific
+parameters (isovalue, lobes, colormap, ranges, materials) for common
+volumetric analyses: NCI/RDG, Fukui, Dual Descriptor, orbitals, MEP,
+ELF, spin density, electron density and QTAIM. Auto-detect reads cube
+headers; NCI and sign(λ₂)ρ cubes are recognized from Multiwfn output.
+
+### QTAIM support
+
+A dedicated tab loads CPs.pdb (colored critical points: BCPs green,
+RCPs red, CCPs yellow) and paths.pdb (gray bond paths) from Multiwfn.
+Works alongside cube-based analyses in the same render. Cube data is
+optional — no error when only PDB files are present.
+
+### NCI rendering
+
+- RDG detected from cube headers; isovalue 0.5 (community standard)
+- Single positive isosurface (the gradient is always positive)
+- BGR colormap [-0.05, 0.05] auto-applied when sign(λ₂)ρ is loaded
+- Loading a sign(λ₂)ρ cube as the main file shows a redirection hint
+
+### MEP improvements
+
+- Fixed symmetric ±0.05 range (percentiles picked up nuclear ESP
+  singularities giving ranges like [-0.02, 0.19])
+- Diffuse (matte) material for readable BWR colors
+- Molecule visible through the surface (opacity 0.65)
+- Hint guides loading ESP as Property Map
+
+### UI
+
+- Render dialog scrollable; Render button bar fixed (always visible)
+- "Open Scene in VMD" launches VMD in a pseudo-terminal (fixes VMD
+  exiting on stdin EOF when launched from a desktop app)
+- Each render project ships an open_in_vmd.sh launcher
+
 ## 2026.11.07
 
 Quality and usability release on top of the initial 2026.11.04

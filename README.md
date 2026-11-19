@@ -12,8 +12,7 @@ by hand in VMD and re-rendered without MoleditPy.
 
 *The HOMO of ethylene — the bonding π orbital — viewed from 45° above
 the molecular plane. Rendered from an ORCA B3LYP/def2-SVP orbital cube
-with this plugin's default High Quality preset. One of the six
-reproducible examples in [`examples/`](examples/README.md).*
+with this plugin's default High Quality preset.*
 
 ## Features
 
@@ -45,6 +44,30 @@ reproducible examples in [`examples/`](examples/README.md).*
 * Native TGA deliverable by default (no re-encode); lossless PNG/TIFF
   conversion and transparent-background keying when requested.
 
+## Analysis Types
+
+A dropdown next to the visual preset configures the scientific
+parameters (isovalue, lobes, colormap, ranges, materials) with
+community-standard values for each analysis — no manual tweaking:
+
+| Analysis | Isovalue | Lobes | Coloring | Notes |
+|---|---|---|---|---|
+| **NCI / RDG** | 0.5 | positive only | BGR ±0.05 | sign(λ₂)ρ as Property Map; blue=attractive, green=vdW, red=steric |
+| **Fukui** | ±0.005 | dual (blue/red) | — | nucleophilic / electrophilic |
+| **Dual Descriptor** | ±0.005 | dual (blue/red) | — | Δf = f+ − f− |
+| **Orbital** | ±0.05 | dual (blue/red) | — | HOMO / LUMO |
+| **MEP** | 0.001 | positive only | BWR ±0.05 | ESP as Property Map; Diffuse material; blue=electron-rich, red=electron-poor |
+| **ELF** | 0.8 | positive only | translucent | localization domains (opacity 0.55) |
+| **Spin density** | ±0.002 | dual (blue/red) | — | α / β |
+| **Density** | 0.001 | positive only | — | vdW surface |
+| **QTAIM** | — | — | BCP green, RCP red, CCP yellow | critical points + bond paths from PDB |
+| **Auto-detect** | (from header) | (from type) | (from type) | reads cube comments |
+
+**QTAIM** has its own tab: load `CPs.pdb` and `paths.pdb` from
+Multiwfn and the plugin renders colored critical points (green BCPs,
+red RCPs, yellow CCPs) alongside gray bond paths. Works with or
+without cube data in the same render.
+
 ## What you get
 
 ### Presets
@@ -74,22 +97,29 @@ Six complete, reproducible workflows live in
 images and a step-by-step guide.
 
 **[🖼️ View the complete gallery →](examples/README.md)** — every image
-below opens at full render resolution (1400 × 1160) when clicked.
+below opens at full resolution when clicked.
 
-| Example | Render (click to view full size) | Guide |
+### Orbitals, MEP and spin density (ORCA + Multiwfn)
+
+| Example | Render | Guide |
 |---|---|---|
-| Ethylene — HOMO π | [![HOMO π of ethylene](examples/01_orbitals/ethylene/render_homo.png)](examples/01_orbitals/ethylene/render_homo.png) | [step by step](examples/01_orbitals/ethylene/README.md) |
-| Ethylene — LUMO π* | [![LUMO π* of ethylene](examples/01_orbitals/ethylene/render_lumo.png)](examples/01_orbitals/ethylene/render_lumo.png) | [step by step](examples/01_orbitals/ethylene/README.md) |
-| Formaldehyde — HOMO n(O) | [![HOMO n(O) of formaldehyde](examples/01_orbitals/formaldehyde/render_homo.png)](examples/01_orbitals/formaldehyde/render_homo.png) | [step by step](examples/01_orbitals/formaldehyde/README.md) |
-| Formaldehyde — LUMO π*(C=O) | [![LUMO π* of formaldehyde](examples/01_orbitals/formaldehyde/render_lumo.png)](examples/01_orbitals/formaldehyde/render_lumo.png) | [step by step](examples/01_orbitals/formaldehyde/README.md) |
-| Water — MEP on density surface | [![MEP of water](examples/02_mep/water/render_mep.png)](examples/02_mep/water/render_mep.png) | [step by step](examples/02_mep/water/README.md) |
-| Chloromethane — MEP, chlorine pocket | [![MEP of chloromethane](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png) | [step by step](examples/02_mep/chloromethane/README.md) |
-| Methyl radical — spin density | [![Spin density of the methyl radical](examples/03_spin_elf/methyl_radical/render_spin.png)](examples/03_spin_elf/methyl_radical/render_spin.png) | [step by step](examples/03_spin_elf/methyl_radical/README.md) |
-| Water — ELF localization domains | [![ELF domains of water](examples/03_spin_elf/water_elf/render_elf.png)](examples/03_spin_elf/water_elf/render_elf.png) | [step by step](examples/03_spin_elf/water_elf/README.md) |
+| Ethylene — HOMO π | [![HOMO π](examples/01_orbitals/ethylene/render_homo.png)](examples/01_orbitals/ethylene/render_homo.png) | [guide](examples/01_orbitals/ethylene/README.md) |
+| Ethylene — LUMO π* | [![LUMO π*](examples/01_orbitals/ethylene/render_lumo.png)](examples/01_orbitals/ethylene/render_lumo.png) | [guide](examples/01_orbitals/ethylene/README.md) |
+| Formaldehyde — HOMO n(O) | [![HOMO n(O)](examples/01_orbitals/formaldehyde/render_homo.png)](examples/01_orbitals/formaldehyde/render_homo.png) | [guide](examples/01_orbitals/formaldehyde/README.md) |
+| Chloromethane — MEP | [![MEP](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png) | [guide](examples/02_mep/chloromethane/README.md) |
+| Methyl radical — spin | [![Spin](examples/03_spin_elf/methyl_radical/render_spin.png)](examples/03_spin_elf/methyl_radical/render_spin.png) | [guide](examples/03_spin_elf/methyl_radical/README.md) |
+
+### NCI, QTAIM, MEP and ELF (Multiwfn Analysis Studio)
+
+| Analysis | Render | Notes |
+|---|---|---|
+| NCI — phenol dimer | [![NCI phenol dimer](assets/examples/example_nci.png)](assets/examples/example_nci.png) | RDG isosurface colored by sign(λ₂)ρ (BGR) |
+| QTAIM — phenol dimer | [![QTAIM phenol dimer](assets/examples/example_qtaim.png)](assets/examples/example_qtaim.png) | BCPs (green), RCPs (red), bond paths (gray) |
+| MEP — chloromethane | [![MEP](assets/examples/example_esp.png)](assets/examples/example_esp.png) | ESP on density surface (BWR, Diffuse) |
+| ELF — water | [![ELF](assets/examples/example_elf.png)](assets/examples/example_elf.png) | Localization domains (translucent) |
 
 Also inside: the [quickstart](examples/00_quickstart/README.md)
-(open a cube → image in one click) and a generator script that re-runs
-the whole gallery.
+and a generator script that re-runs the gallery.
 
 ## Requirements
 
