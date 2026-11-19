@@ -1146,10 +1146,11 @@ STUDY_TYPES = {
         "label": "NCI / RDG",
         "iso_pos": 0.5, "show_neg": False,
         "map_colormap": "BGR", "map_low": -0.05, "map_high": 0.05,
-        "opacity": 0.75,
+        "opacity": 0.75, "cube_material": "Diffuse",
         "hint": ("Reduced density gradient at 0.5. Load the "
                  "sign(λ₂)ρ cube as Property Map for blue (attractive) / "
-                 "green (vdW) / red (steric) coloring."),
+                 "green (vdW) / red (steric) coloring. "
+                 "Matte material for readable BGR colors."),
     },
     "fukui": {
         "label": "Fukui function (f+ / f− / f0)",
