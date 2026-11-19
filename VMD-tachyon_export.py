@@ -1174,9 +1174,13 @@ STUDY_TYPES = {
     "mep": {
         "label": "MEP on density surface",
         "iso_pos": 0.001, "show_neg": False,
-        "map_colormap": "BWR",
-        "hint": ("0.001 a.u. density surface. Load the ESP cube as "
-                 "Property Map; BWR scale auto-ranges from percentiles."),
+        "map_colormap": "BWR", "map_low": -0.05, "map_high": 0.05,
+        "map_range_set": True,
+        "opacity": 0.65,
+        "hint": ("0.001 a.u. density surface with ESP coloring: "
+                 "blue = electron-rich (nucleophilic), "
+                 "red = electron-poor (electrophilic). "
+                 "Range ±0.05; adjust for your system."),
     },
     "elf": {
         "label": "ELF localization domains",
@@ -2411,6 +2415,14 @@ def prepare_project(context, settings, installation, log):
                         "[-0.05, 0.05] BGR (blue=attractive, green=vdW, "
                         "red=steric)"
                     )
+                elif cube.get("interpretation") == "potential":
+                    # MEP: symmetric ±0.05 (percentiles pick up nuclear
+                    # singularities giving ranges like [-0.02, 0.19])
+                    cube["map_low"] = -0.05
+                    cube["map_high"] = 0.05
+                    cube["map_range_set"] = True
+                    log("[cube] MEP range set to ±0.05 (blue = "
+                        "electron-rich, red = electron-poor)")
                 else:
                     map_range = cube_data_percentiles(map_path,
                                                       map_header)
@@ -3670,6 +3682,7 @@ def _build_dialog_class():
                 "map_path": self.cube_map_edit.text().strip(),
                 "map_low": self.map_low.value(),
                 "map_high": self.map_high.value(),
+                "map_range_set": getattr(self, "_map_range_preset", False),
                 "map_colormap": self.map_colormap.currentText(),
             })
             settings["cube"] = cube
@@ -4017,6 +4030,9 @@ def _build_dialog_class():
                 self.map_low.setValue(cfg["map_low"])
             if "map_high" in cfg:
                 self.map_high.setValue(cfg["map_high"])
+            # persist the preset's range so prepare_project doesn't
+            # override it with auto-detection
+            self._map_range_preset = ("map_low" in cfg)
 
         def _on_cube_toggled(self):
             enabled = self.cube_enabled.isChecked()
