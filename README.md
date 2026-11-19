@@ -113,7 +113,7 @@ below opens at full resolution when clicked.
 | Chloromethane | MEP | [![MEP](examples/02_mep/chloromethane/render_mep.png)](examples/02_mep/chloromethane/render_mep.png) |
 | Methyl radical | Spin density | [![Spin](examples/03_spin_elf/methyl_radical/render_spin.png)](examples/03_spin_elf/methyl_radical/render_spin.png) |
 | Water | ELF | [![ELF](examples/03_spin_elf/water_elf/render_elf.png)](examples/03_spin_elf/water_elf/render_elf.png) |
-| Phenol dimer | NCI | [![NCI](assets/examples/example_nci.png)](assets/examples/example_nci.png) |
+| Phenol dimer | NCI | [![NCI](assets/examples/nci_phenol_dimer.png)](assets/examples/nci_phenol_dimer.png) |
 | Phenol dimer | QTAIM | [![QTAIM](assets/examples/example_qtaim.png)](assets/examples/example_qtaim.png) |
 | Phenol | Dual Descriptor | [![DD](assets/examples/example_dd.png)](assets/examples/example_dd.png) |
 
