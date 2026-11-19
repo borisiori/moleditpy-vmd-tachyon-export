@@ -1185,11 +1185,10 @@ STUDY_TYPES = {
         "map_range_set": True,
         "opacity": 0.65,
         "cube_material": "Diffuse",
-        "hint": ("0.001 a.u. density surface with ESP coloring: "
+        "hint": ("Load the ESP cube as Property Map for coloring: "
                  "blue = electron-rich (nucleophilic), "
                  "red = electron-poor (electrophilic). "
-                 "Range ±0.05; adjust for your system. "
-                 "Matte material (Diffuse) for readable colors."),
+                 "Range ±0.05; adjust for your system."),
     },
     "elf": {
         "label": "ELF localization domains",
@@ -3449,33 +3448,36 @@ def _build_dialog_class():
             grid = QGridLayout(tab)
             grid.setVerticalSpacing(6)
 
-            # --- QTAIM: critical points + bond paths -----------------------
-            qtaim_box = QGroupBox(
-                "QTAIM: Critical Points + Bond Paths (from Multiwfn)")
-            qtaim_grid = QGridLayout(qtaim_box)
+            # --- QTAIM: compact one-line loader --------------------------
+            qtaim_box = QGroupBox("QTAIM")
+            qtaim_layout = QHBoxLayout(qtaim_box)
+            qtaim_layout.setSpacing(4)
+            cps_btn = QPushButton("CPs…")
+            cps_btn.setFixedWidth(55)
+            cps_btn.setToolTip("Critical points PDB from Multiwfn")
+            cps_btn.clicked.connect(self._browse_qtaim_cps)
+            qtaim_layout.addWidget(cps_btn)
             self.qtaim_cps_edit = QLineEdit()
-            self.qtaim_cps_edit.setPlaceholderText("path/to/CPs.pdb")
-            qtaim_grid.addWidget(QLabel("Critical Points:"), 0, 0)
-            qtaim_grid.addWidget(self.qtaim_cps_edit, 0, 1)
-            cps_browse = QPushButton("Load CPs…")
-            cps_browse.clicked.connect(self._browse_qtaim_cps)
-            qtaim_grid.addWidget(cps_browse, 0, 2)
+            self.qtaim_cps_edit.setPlaceholderText("CPs.pdb")
+            self.qtaim_cps_edit.setMinimumWidth(80)
+            qtaim_layout.addWidget(self.qtaim_cps_edit, 1)
+            paths_btn = QPushButton("Paths…")
+            paths_btn.setFixedWidth(60)
+            paths_btn.setToolTip("Bond paths PDB from Multiwfn")
+            paths_btn.clicked.connect(self._browse_qtaim_paths)
+            qtaim_layout.addWidget(paths_btn)
             self.qtaim_paths_edit = QLineEdit()
-            self.qtaim_paths_edit.setPlaceholderText("path/to/paths.pdb")
-            qtaim_grid.addWidget(QLabel("Bond Paths:"), 1, 0)
-            qtaim_grid.addWidget(self.qtaim_paths_edit, 1, 1)
-            paths_browse = QPushButton("Load Paths…")
-            paths_browse.clicked.connect(self._browse_qtaim_paths)
-            qtaim_grid.addWidget(paths_browse, 1, 2)
+            self.qtaim_paths_edit.setPlaceholderText("paths.pdb")
+            self.qtaim_paths_edit.setMinimumWidth(80)
+            qtaim_layout.addWidget(self.qtaim_paths_edit, 1)
             self.qtaim_cp_radius = QDoubleSpinBox()
             self.qtaim_cp_radius.setRange(0.05, 2.0)
             self.qtaim_cp_radius.setSingleStep(0.05)
             self.qtaim_cp_radius.setValue(0.4)
-            qtaim_grid.addWidget(QLabel("CP radius (Å):"), 2, 0)
-            qtaim_grid.addWidget(self.qtaim_cp_radius, 2, 1)
-            qtaim_grid.addWidget(QLabel(
-                "BCPs green · RCPs red · CCPs yellow · paths gray"
-            ), 3, 0, 1, 3)
+            self.qtaim_cp_radius.setFixedWidth(55)
+            self.qtaim_cp_radius.setToolTip("Critical point sphere radius (Å)")
+            qtaim_layout.addWidget(QLabel("r:"))
+            qtaim_layout.addWidget(self.qtaim_cp_radius)
             grid.addWidget(qtaim_box, 0, 0, 1, 2)
 
             file_box = QGroupBox("Gaussian Cube File (.cub / .cube / .gz)")
