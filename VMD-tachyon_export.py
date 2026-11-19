@@ -1106,8 +1106,10 @@ def suggest_isovalue(data_range, interpretation="other"):
     """A reasonable starting isovalue from the data range (editable)."""
     if not data_range:
         return 0.002
-    # NCI / reduced density gradient: community standard isovalue
-    if interpretation == "nci_rdg":
+    # NCI workflow (RDG shape or sign(lambda2)rho coloring): the
+    # isosurface is always of the RDG at 0.5 regardless of which cube
+    # of the pair was loaded first
+    if interpretation in ("nci_rdg", "nci_sign_lambda2"):
         return 0.5
     max_abs = max(abs(data_range[0]), abs(data_range[1]))
     if max_abs < 1e-9:
@@ -4027,6 +4029,10 @@ def _build_dialog_class():
             if guess == "nci_rdg":
                 nci_hint = ("\nNCI detected — load the sign(λ₂)ρ cube under "
                             "Property Map for blue/green/red coloring")
+            elif guess == "nci_sign_lambda2":
+                nci_hint = ("\nThis is the sign(λ₂)ρ coloring cube — load "
+                            "it under Property Map, not here. The main cube "
+                            "should be the RDG (isosurface at 0.5).")
             self.cube_info.setText(
                 f"{header['natoms']} atoms · grid "
                 f"{header['dims'][0]}×{header['dims'][1]}×{header['dims'][2]} "
@@ -4036,9 +4042,13 @@ def _build_dialog_class():
                 + nci_hint
             )
             if data_range:
-                suggestion = suggest_isovalue(data_range, guess)
-                self.iso_pos.setValue(suggestion)
-                self.iso_neg.setValue(-suggestion)
+                # Only auto-suggest the isovalue when no specific study
+                # has been selected — the user's analysis choice wins
+                current_study = self.study_combo.currentData()
+                if current_study in ("auto", "custom", None):
+                    suggestion = suggest_isovalue(data_range, guess)
+                    self.iso_pos.setValue(suggestion)
+                    self.iso_neg.setValue(-suggestion)
                 # NCI: no negative lobe; preselect BGR for the color map
                 if guess == "nci_rdg":
                     self.show_neg.setChecked(False)
