@@ -1165,6 +1165,13 @@ STUDY_TYPES = {
                  "Δf < 0 (red) = electrophilic sites; "
                  "isovalue ±0.005."),
     },
+    "qtaim": {
+        "label": "QTAIM (CPs + bond paths)",
+        "hint": ("Load CPs.pdb and paths.pdb from Multiwfn. "
+                 "BCPs green, RCPs red, CCPs yellow, paths gray."),
+        "cp_radius": 0.4,
+        "path_style": "Lines",
+    },
     "orbital": {
         "label": "Molecular orbital (HOMO / LUMO)",
         "iso_pos": 0.05, "show_neg": True,
@@ -1535,6 +1542,56 @@ def _labels_tcl(settings, natoms):
     return lines
 
 
+def _qtaim_tcl(settings):
+    """QTAIM scene: molecule + colored critical points + bond paths.
+
+    Expects two PDB files from Multiwfn:
+    - CPs.pdb: atom names encode CP types (N=BCP, O=RCP, F=CCP)
+    - paths.pdb: sequential atoms forming gradient paths
+    """
+    cps_raw = settings.get("qtaim_cps_path", "")
+    paths_raw = settings.get("qtaim_paths_path", "")
+    cps = f"geometry/{Path(cps_raw).name}" if cps_raw else ""
+    paths = f"geometry/{Path(paths_raw).name}" if paths_raw else ""
+    if not cps or not paths:
+        return []
+
+    cp_rad = float(settings.get("qtaim_cp_radius", 0.4))
+    lines = []
+    lines.append("# --- QTAIM: critical points and bond paths ---")
+
+    # CPs molecule: colored spheres by CP type
+    lines.append(f"mol new {cps} type pdb waitfor all")
+    lines.append("mol delrep 0 top")
+    # N = bond critical points (green)
+    lines.append(f"mol representation VDW {cp_rad:.3f} 22")
+    lines.append("mol color ColorID 7")
+    lines.append('mol selection {name N}')
+    lines.append("mol material Diffuse")
+    lines.append("mol addrep top")
+    # O = ring critical points (red)
+    lines.append(f"mol representation VDW {cp_rad:.3f} 22")
+    lines.append("mol color ColorID 1")
+    lines.append('mol selection {name O}')
+    lines.append("mol material Diffuse")
+    lines.append("mol addrep top")
+    # F = cage critical points (yellow)
+    lines.append(f"mol representation VDW {cp_rad + 0.1:.3f} 22")
+    lines.append("mol color ColorID 4")
+    lines.append('mol selection {name F}')
+    lines.append("mol material Diffuse")
+    lines.append("mol addrep top")
+
+    # Paths molecule: gray lines
+    lines.append(f"mol new {paths} type pdb waitfor all")
+    lines.append("mol delrep 0 top")
+    lines.append("mol representation Lines")
+    lines.append("mol color ColorID 2")
+    lines.append("mol material Opaque")
+    lines.append("mol addrep top")
+    return lines
+
+
 def _cube_tcl(settings, header, mol_var="mol"):
     """Volumetric block: same molecule when atom counts match, else its own
     molecule id.
@@ -1761,6 +1818,12 @@ def build_scene_tcl(settings, camera, natoms, cube_header=None):
     lines.extend(_labels_tcl(settings, natoms))
     lines.append("")
     cube_lines, _volume_mol = _cube_tcl(settings, cube_header)
+    if not cube_lines:
+        # QTAIM mode: render critical points and bond paths instead of
+        # (or in addition to) isosurfaces
+        qtaim_lines = _qtaim_tcl(settings)
+        if qtaim_lines:
+            lines.extend(qtaim_lines)
     if cube_lines:
         lines.append("# --- volumetric data (isosurfaces) ---")
         lines.extend(cube_lines)
@@ -2511,6 +2574,16 @@ def prepare_project(context, settings, installation, log):
             "use_connectivity", True) else []),
         encoding="utf-8",
     )
+
+    # QTAIM files: copy into the project for portability
+    for key, field in (("qtaim_cps_path", "CPs.pdb"),
+                       ("qtaim_paths_path", "paths.pdb")):
+        src = settings.get(key, "")
+        if src and Path(src).is_file():
+            dest = project / "geometry" / Path(src).name
+            if not dest.is_file():
+                shutil.copy2(src, dest)
+            settings[key] = str(dest)  # use the project-relative copy
 
     # volumetric copy
     if cube.get("enabled"):
@@ -3376,6 +3449,35 @@ def _build_dialog_class():
             grid = QGridLayout(tab)
             grid.setVerticalSpacing(6)
 
+            # --- QTAIM: critical points + bond paths -----------------------
+            qtaim_box = QGroupBox(
+                "QTAIM: Critical Points + Bond Paths (from Multiwfn)")
+            qtaim_grid = QGridLayout(qtaim_box)
+            self.qtaim_cps_edit = QLineEdit()
+            self.qtaim_cps_edit.setPlaceholderText("path/to/CPs.pdb")
+            qtaim_grid.addWidget(QLabel("Critical Points:"), 0, 0)
+            qtaim_grid.addWidget(self.qtaim_cps_edit, 0, 1)
+            cps_browse = QPushButton("Load CPs…")
+            cps_browse.clicked.connect(self._browse_qtaim_cps)
+            qtaim_grid.addWidget(cps_browse, 0, 2)
+            self.qtaim_paths_edit = QLineEdit()
+            self.qtaim_paths_edit.setPlaceholderText("path/to/paths.pdb")
+            qtaim_grid.addWidget(QLabel("Bond Paths:"), 1, 0)
+            qtaim_grid.addWidget(self.qtaim_paths_edit, 1, 1)
+            paths_browse = QPushButton("Load Paths…")
+            paths_browse.clicked.connect(self._browse_qtaim_paths)
+            qtaim_grid.addWidget(paths_browse, 1, 2)
+            self.qtaim_cp_radius = QDoubleSpinBox()
+            self.qtaim_cp_radius.setRange(0.05, 2.0)
+            self.qtaim_cp_radius.setSingleStep(0.05)
+            self.qtaim_cp_radius.setValue(0.4)
+            qtaim_grid.addWidget(QLabel("CP radius (Å):"), 2, 0)
+            qtaim_grid.addWidget(self.qtaim_cp_radius, 2, 1)
+            qtaim_grid.addWidget(QLabel(
+                "BCPs green · RCPs red · CCPs yellow · paths gray"
+            ), 3, 0, 1, 3)
+            grid.addWidget(qtaim_box, 0, 0, 1, 2)
+
             file_box = QGroupBox("Gaussian Cube File (.cub / .cube / .gz)")
             file_grid = QGridLayout(file_box)
             self.cube_enabled = QCheckBox("Render volumetric data (isosurfaces)")
@@ -3687,6 +3789,9 @@ def _build_dialog_class():
                 "map_range_set": getattr(self, "_map_range_preset", False),
                 "map_colormap": self.map_colormap.currentText(),
             })
+            settings["qtaim_cps_path"] = self.qtaim_cps_edit.text().strip()
+            settings["qtaim_paths_path"] = self.qtaim_paths_edit.text().strip()
+            settings["qtaim_cp_radius"] = self.qtaim_cp_radius.value()
             settings["cube"] = cube
             return settings
 
@@ -3754,6 +3859,10 @@ def _build_dialog_class():
                               cube.get("material", "Glossy"))
             self._select_data(self.study_combo,
                               cube.get("study_type", "auto"))
+            self.qtaim_cps_edit.setText(s.get("qtaim_cps_path", ""))
+            self.qtaim_paths_edit.setText(s.get("qtaim_paths_path", ""))
+            self.qtaim_cp_radius.setValue(
+                float(s.get("qtaim_cp_radius", 0.4)))
             self.show_molecule_check.setChecked(bool(cube.get("show_molecule", True)))
             self.cube_map_edit.setText(cube.get("map_path", ""))
             self.map_low.setValue(float(cube.get("map_low", -0.03)))
@@ -3990,6 +4099,22 @@ def _build_dialog_class():
                             "Set also the SHAPE cube above (e.g. density.cub);"
                             " this map only colors its surface."
                         )
+
+        def _browse_qtaim_cps(self):
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Select the QTAIM critical points PDB", "",
+                "PDB Files (*CPs.pdb *CP.pdb *.pdb);;All Files (*)",
+            )
+            if path:
+                self.qtaim_cps_edit.setText(path)
+
+        def _browse_qtaim_paths(self):
+            path, _ = QFileDialog.getOpenFileName(
+                self, "Select the QTAIM bond paths PDB", "",
+                "PDB Files (*paths.pdb *path.pdb *.pdb);;All Files (*)",
+            )
+            if path:
+                self.qtaim_paths_edit.setText(path)
 
         def _browse_output(self):
             path = QFileDialog.getExistingDirectory(
