@@ -44,6 +44,13 @@ with this plugin's default High Quality preset.*
 * Native TGA deliverable by default (no re-encode); lossless PNG/TIFF
   conversion and transparent-background keying when requested.
 
+## Demo
+
+[![Usage video placeholder](https://img.youtube.com/vi/placeholder/maxresdefault.jpg)](https://youtu.be/placeholder)
+
+*Quick walkthrough: loading a cube, selecting an analysis type and
+rendering with VMD/Tachyon — coming soon.*
+
 ## Analysis Types
 
 A dropdown next to the visual preset configures the scientific
