@@ -1084,6 +1084,9 @@ def guess_cube_interpretation(header):
         return "other"
     text = " ".join(header.get("comments", [])).lower()
     rules = (
+        ("nci_rdg", ("reduced density gradient", "rdg",)),
+        ("nci_sign_lambda2", ("sign(lambda2)", "sign(lambda2)rho",
+                              "sign of lambda2")),
         ("homo", ("homo", "highest occupied")),
         ("lumo", ("lumo", "lowest unoccupied")),
         ("spin_density", ("spin density", "spin density", "spindens")),
@@ -1099,10 +1102,13 @@ def guess_cube_interpretation(header):
     return "other"
 
 
-def suggest_isovalue(data_range):
+def suggest_isovalue(data_range, interpretation="other"):
     """A reasonable starting isovalue from the data range (editable)."""
     if not data_range:
         return 0.002
+    # NCI / reduced density gradient: community standard isovalue
+    if interpretation == "nci_rdg":
+        return 0.5
     max_abs = max(abs(data_range[0]), abs(data_range[1]))
     if max_abs < 1e-9:
         return 0.002
@@ -1124,6 +1130,78 @@ VMD_MATERIALS = [
     "Translucent", "Edgy", "EdgyShiny", "EdgyGlass", "Ghost",
     "Glass1", "Glass2", "Glass3", "BlownGlass", "GlassBubble", "RTChrome",
 ]
+
+# Scientific study presets: configure isovalue, lobes, colormap and
+# ranges for common volumetric analyses so users don't need to know
+# the community-standard parameters for each one.
+STUDY_TYPES = {
+    "auto": {
+        "label": "Auto-detect (from cube header)",
+    },
+    "nci": {
+        "label": "NCI / RDG",
+        "iso_pos": 0.5, "show_neg": False,
+        "map_colormap": "BGR", "map_low": -0.05, "map_high": 0.05,
+        "opacity": 0.75,
+        "hint": ("Reduced density gradient at 0.5. Load the "
+                 "sign(λ₂)ρ cube as Property Map for blue (attractive) / "
+                 "green (vdW) / red (steric) coloring."),
+    },
+    "fukui": {
+        "label": "Fukui function (f+ / f− / f0)",
+        "iso_pos": 0.005, "show_neg": True,
+        "pos_color": "#1e90ff", "neg_color": "#e81717",
+        "hint": "Two lobes (nucleophilic/electrophilic) at ±0.005.",
+    },
+    "orbital": {
+        "label": "Molecular orbital (HOMO / LUMO)",
+        "iso_pos": 0.05, "show_neg": True,
+        "pos_color": "#1e90ff", "neg_color": "#e81717",
+        "hint": "Two lobes (positive/negative phase) at ±0.05.",
+    },
+    "mep": {
+        "label": "MEP on density surface",
+        "iso_pos": 0.001, "show_neg": False,
+        "map_colormap": "BWR",
+        "hint": ("0.001 a.u. density surface. Load the ESP cube as "
+                 "Property Map; BWR scale auto-ranges from percentiles."),
+    },
+    "elf": {
+        "label": "ELF localization domains",
+        "iso_pos": 0.8, "show_neg": False,
+        "opacity": 0.55,
+        "hint": ("ELF = 0.8 isosurface, translucent to see the molecule "
+                 "inside the localization domains."),
+    },
+    "spin": {
+        "label": "Spin density (α / β)",
+        "iso_pos": 0.002, "show_neg": True,
+        "pos_color": "#1e90ff", "neg_color": "#e81717",
+        "hint": "α spin in blue, β in red; isovalue ±0.002.",
+    },
+    "density": {
+        "label": "Electron density",
+        "iso_pos": 0.001, "show_neg": False,
+        "hint": "Total density isosurface at 0.001 a.u. (vdW surface).",
+    },
+    "custom": {
+        "label": "Custom (set everything manually)",
+    },
+}
+
+# Map auto-detected interpretations to study-type keys
+_INTERPRETATION_TO_STUDY = {
+    "nci_rdg": "nci",
+    "nci_sign_lambda2": "nci",
+    "fukui": "fukui",
+    "orbital": "orbital",
+    "homo": "orbital",
+    "lumo": "orbital",
+    "density": "density",
+    "spin_density": "spin",
+    "potential": "mep",
+}
+
 
 REPRESENTATION_STYLES = [
     ("ball_and_stick", "Ball and Stick"),
@@ -1517,7 +1595,9 @@ def _cube_tcl(settings, header, mol_var="mol"):
             float(cube.get("iso_pos", 0.005)), 31,
             _hex_to_rgb01(cube.get("pos_color", "#1e90ff")),
         )
-    if cube.get("show_neg", True):
+    # NCI / RDG: single positive isosurface (the gradient is always
+    # positive — a negative lobe makes no chemical sense)
+    if cube.get("show_neg", True) and cube.get("interpretation") != "nci_rdg":
         iso_rep(
             float(cube.get("iso_neg", -0.005)), 32,
             _hex_to_rgb01(cube.get("neg_color", "#e81717")),
@@ -2268,6 +2348,23 @@ def prepare_project(context, settings, installation, log):
             )
         if cube.get("interpretation", "auto") == "auto":
             cube["interpretation"] = guess_cube_interpretation(cube_header)
+        # A user-selected study type overrides the header-based guess:
+        # the analysis determines the rendering, not the file comment
+        study = cube.get("study_type") or ""
+        if study and study not in ("auto", "custom"):
+            # map study keys back to interpretation keys where they
+            # differ (the rendering logic reads "interpretation")
+            reverse = {
+                "nci": "nci_rdg",
+                "fukui": "fukui",
+                "orbital": "orbital",
+                "mep": "potential",
+                "elf": "other",
+                "spin": "spin_density",
+                "density": "density",
+            }
+            cube["interpretation"] = reverse.get(study,
+                                                 cube["interpretation"])
         map_path = cube.get("map_path") or ""
         if map_path:
             if not Path(map_path).is_file():
@@ -2287,17 +2384,33 @@ def prepare_project(context, settings, installation, log):
                     "atoms)"
                 )
             if not cube.get("map_range_set"):
-                map_range = cube_data_percentiles(map_path, map_header)
-                if map_range:
-                    cube["map_low"] = round(map_range[0], 6)
-                    cube["map_high"] = round(map_range[1], 6)
+                # NCI coloring: sign(lambda2)rho spans [-0.05, 0.05] by
+                # community convention (blue=attractive, green=vdW,
+                # red=steric)
+                if cube.get("interpretation") == "nci_rdg":
+                    cube["map_colormap"] = "BGR"
+                    cube["map_low"] = -0.05
+                    cube["map_high"] = 0.05
                     cube["map_range_set"] = True
                     log(
-                        "[cube] property map range "
-                        f"[{cube['map_low']:.4g}, {cube['map_high']:.4g}] "
-                        "auto-filled from percentiles (editable in the "
-                        "Volumetric tab)"
+                        "[cube] NCI coloring: sign(lambda2)rho mapped to "
+                        "[-0.05, 0.05] BGR (blue=attractive, green=vdW, "
+                        "red=steric)"
                     )
+                else:
+                    map_range = cube_data_percentiles(map_path,
+                                                      map_header)
+                    if map_range:
+                        cube["map_low"] = round(map_range[0], 6)
+                        cube["map_high"] = round(map_range[1], 6)
+                        cube["map_range_set"] = True
+                        log(
+                            "[cube] property map range "
+                            f"[{cube['map_low']:.4g}, "
+                            f"{cube['map_high']:.4g}] "
+                            "auto-filled from percentiles (editable in "
+                            "the Volumetric tab)"
+                        )
         settings["cube"] = cube
 
     # ---- camera -----------------------------------------------------------
@@ -2816,6 +2929,7 @@ def _build_dialog_class():
             root.setContentsMargins(0, 0, 0, 0)
             root.addWidget(self._build_setup_group())
             root.addWidget(self._build_preset_row())
+            root.addWidget(self._build_study_row())
             self.tabs = QTabWidget()
             self.tabs.addTab(self._build_molecule_tab(), "Molecule")
             self.tabs.addTab(self._build_representation_tab(),
@@ -2900,6 +3014,35 @@ def _build_dialog_class():
             return frame
 
         # ------------------------------------------------------------- tabs
+        def _build_study_row(self):
+            """Analysis Type selector — sits right below the preset row
+            so the workflow reads: pick a look → pick the science →
+            load the cube → Render."""
+            row = QHBoxLayout()
+
+            row.addWidget(QLabel("Analysis:"))
+            self.study_combo = QComboBox()
+            for key, cfg in STUDY_TYPES.items():
+                self.study_combo.addItem(cfg["label"], key)
+            self.study_combo.setToolTip(
+                "Scientific presets: select the analysis and the plugin\n"
+                "configures isovalue, lobes, colormap and ranges with the\n"
+                "community-standard parameters.\n\n"
+                "'Auto-detect' reads the cube header and picks the\n"
+                "closest match when you load a file."
+            )
+            self.study_combo.currentIndexChanged.connect(self._apply_study)
+            row.addWidget(self.study_combo, 1)
+
+            self.study_hint = QLabel("")
+            self.study_hint.setWordWrap(False)
+            self.study_hint.setStyleSheet("color: gray; font-size: 11px;")
+            row.addWidget(self.study_hint, 2)
+
+            frame = QFrame()
+            frame.setLayout(row)
+            return frame
+
         def _build_molecule_tab(self):
             tab = QWidget()
             grid = QGridLayout(tab)
@@ -3230,6 +3373,8 @@ def _build_dialog_class():
             self.cube_interpretation = QComboBox()
             for key, label in (
                 ("auto", "Auto-detect from header"),
+                ("nci_rdg", "NCI / RDG isosurface"),
+                ("nci_sign_lambda2", "NCI sign(λ₂)ρ (color map)"),
                 ("homo", "HOMO"), ("lumo", "LUMO"),
                 ("density", "Electron density"), ("spin_density", "Spin density"),
                 ("fukui", "Fukui function"), ("orbital", "Molecular orbital"),
@@ -3496,6 +3641,7 @@ def _build_dialog_class():
                 "enabled": self.cube_enabled.isChecked(),
                 "path": self.cube_edit.text().strip(),
                 "interpretation": self.cube_interpretation.currentData(),
+                "study_type": self.study_combo.currentData(),
                 "iso_pos": self.iso_pos.value(),
                 "iso_neg": self.iso_neg.value(),
                 "pos_color": self._button_color(self.pos_color_btn, "#1e90ff"),
@@ -3575,6 +3721,8 @@ def _build_dialog_class():
             self.cube_opacity.setValue(float(cube.get("opacity", 0.75)))
             self._select_text(self.cube_material,
                               cube.get("material", "Glossy"))
+            self._select_data(self.study_combo,
+                              cube.get("study_type", "auto"))
             self.show_molecule_check.setChecked(bool(cube.get("show_molecule", True)))
             self.cube_map_edit.setText(cube.get("map_path", ""))
             self.map_low.setValue(float(cube.get("map_low", -0.03)))
@@ -3819,6 +3967,41 @@ def _build_dialog_class():
             if path:
                 self.output_edit.setText(path)
 
+        def _apply_study(self):
+            """Apply a scientific study preset: configure isovalue, lobes,
+            colormap and ranges with community-standard parameters."""
+            key = self.study_combo.currentData()
+            if not key or key in ("auto", "custom"):
+                self.study_hint.setText(
+                    "Auto-detect reads the cube header; "
+                    "Custom leaves everything to you." if key == "auto"
+                    else "")
+                return
+            cfg = STUDY_TYPES[key]
+            self.study_hint.setText(cfg.get("hint", ""))
+            if not self.cube_enabled.isChecked():
+                self.cube_enabled.setChecked(True)
+            if "iso_pos" in cfg:
+                self.iso_pos.setValue(cfg["iso_pos"])
+                self.iso_neg.setValue(-cfg["iso_pos"])
+            if "show_neg" in cfg:
+                self.show_neg.setChecked(cfg["show_neg"])
+            if "pos_color" in cfg:
+                self._set_button_color(self.pos_color_btn,
+                                       cfg["pos_color"])
+            if "neg_color" in cfg:
+                self._set_button_color(self.neg_color_btn,
+                                       cfg["neg_color"])
+            if "opacity" in cfg:
+                self.cube_opacity.setValue(cfg["opacity"])
+            if "map_colormap" in cfg:
+                self._select_text(self.map_colormap,
+                                  cfg["map_colormap"])
+            if "map_low" in cfg:
+                self.map_low.setValue(cfg["map_low"])
+            if "map_high" in cfg:
+                self.map_high.setValue(cfg["map_high"])
+
         def _on_cube_toggled(self):
             enabled = self.cube_enabled.isChecked()
             for widget in (self.cube_edit, self.iso_pos, self.iso_neg,
@@ -3840,18 +4023,35 @@ def _build_dialog_class():
                 return
             data_range = cube_data_range(path, header)
             guess = guess_cube_interpretation(header)
+            nci_hint = ""
+            if guess == "nci_rdg":
+                nci_hint = ("\nNCI detected — load the sign(λ₂)ρ cube under "
+                            "Property Map for blue/green/red coloring")
             self.cube_info.setText(
                 f"{header['natoms']} atoms · grid "
                 f"{header['dims'][0]}×{header['dims'][1]}×{header['dims'][2]} "
                 f"({header['points']} points) · "
                 + (f"data range [{data_range[0]:.3e}, {data_range[1]:.3e}] · "
                    f"guessed: {guess}" if data_range else "data unreadable")
+                + nci_hint
             )
             if data_range:
-                suggestion = suggest_isovalue(data_range)
+                suggestion = suggest_isovalue(data_range, guess)
                 self.iso_pos.setValue(suggestion)
                 self.iso_neg.setValue(-suggestion)
+                # NCI: no negative lobe; preselect BGR for the color map
+                if guess == "nci_rdg":
+                    self.show_neg.setChecked(False)
+                    self._select_text(self.map_colormap, "BGR")
+                    self.map_low.setValue(-0.05)
+                    self.map_high.setValue(0.05)
             self._select_data(self.cube_interpretation, guess)
+            # Auto-select the matching study type (silently — the user
+            # can override with the combo afterwards)
+            study_key = _INTERPRETATION_TO_STUDY.get(guess, "")
+            if study_key and self.study_combo.currentData() == "auto":
+                self._select_data(self.study_combo, study_key)
+                self._apply_study()
 
         # -------------------------------------------------- molecule + view
         def _refresh_molecule_info(self):
