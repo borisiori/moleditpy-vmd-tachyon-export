@@ -800,3 +800,73 @@ def test_cube_isosurface_radius_units_and_margin(vmd, benzene):
                             fit_radius=3.0)
     assert fit["scale"] == pytest.approx(
         vmd.VMD_ORTHO_HALFHEIGHT / (3.0 * 1.15))
+
+
+class TestQtaimExactPaths:
+    """Owner report: VMD drew many more bond paths than the studio's
+    viewer, even between distant atoms (measured: 15,173 guessed bonds
+    on the phenol-dimer paths.pdb vs the 2,477 real ones — VMD's own
+    log said 'Excessive bonding errors'). Fixes: explicit CONECT
+    records chained inside each TER block + `autobonds 0` + a
+    molecule-mismatch guard before staging."""
+
+    def _paths_pdb(self, tmp_path):
+        p = tmp_path / "paths.pdb"
+        p.write_text(
+            "HETATM    1  C   PTH A   1    0.000   0.000   0.000\n"
+            "HETATM    2  C   PTH A   1    0.010   0.000   0.000\n"
+            "TER\n"
+            "HETATM    3  C   PTH A   1    5.000   0.000   0.000\n"
+            "HETATM    4  C   PTH A   1    5.010   0.000   0.000\n"
+            "TER\n")
+        return p
+
+    def test_conect_chains_within_ter_blocks(self, vmd, tmp_path):
+        dest = tmp_path / "out.pdb"
+        vmd._write_paths_with_conect(self._paths_pdb(tmp_path), dest)
+        conects = [l for l in dest.read_text().splitlines()
+                   if l.startswith("CONECT")]
+        assert conects == ["CONECT    1    2", "CONECT    3    4"]
+
+    def test_qtaim_tcl_disables_autobonds(self, vmd, tmp_path):
+        src = str(self._paths_pdb(tmp_path))
+        tcl = vmd._qtaim_tcl(
+            {"qtaim_cps_path": src, "qtaim_paths_path": src})
+        paths_mol = [l for l in tcl if "PTH" in l or "paths" in l
+                     or "autobonds" in l]
+        assert any("autobonds 0" in l for l in tcl)
+
+    def test_guard_rejects_mismatched_molecule(self, vmd, tmp_path):
+        """26 nuclear CPs must not render over a 32-atom structure
+        (owner: QTAIM network floating over the wrong CPK)."""
+        import numpy as np
+        import pytest
+
+        cps = tmp_path / "CPs.pdb"
+        rows = []
+        for i in range(26):
+            rows.append(
+                f"HETATM{i + 1:5d}  C   CPS A   1    "
+                f"{i * 1.4:8.3f}  0.000   0.000")
+        cps.write_text("\n".join(rows) + "\n")
+        nuclear = vmd._nuclear_cp_positions(str(cps))
+        assert len(nuclear) == 26
+        other = np.zeros((32, 3))
+        assert len(nuclear) != len(other)  # the mismatch being guarded
+
+    def test_guard_passes_on_the_example_run(self, vmd):
+        """The shipped phenol-dimer example must pass the guard's
+        distance check (nuclear CPs sit on the nuclei)."""
+        import numpy as np
+
+        root = Path(__file__).resolve().parents[1] / "examples" / \
+            "05_qtaim" / "phenol_dimer"
+        nuclear = vmd._nuclear_cp_positions(str(root / "CPs.pdb"))
+        xyz = [l.split() for l in (root / "PhenolDimer.xyz")
+               .read_text().splitlines()[2:] if l.strip()]
+        pos = np.array([[float(r[1]), float(r[2]), float(r[3])]
+                        for r in xyz])
+        assert len(nuclear) == len(pos)
+        dist = np.linalg.norm(
+            nuclear[:, None, :] - pos[None, :, :], axis=2).min(axis=1)
+        assert dist.max() < 0.5

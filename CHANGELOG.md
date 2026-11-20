@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+### QTAIM: exact bond paths + molecule-mismatch guard
+
+- `paths.pdb` is staged with explicit CONECT records (one per
+  consecutive point pair inside each TER block) and loaded with
+  `autobonds 0` — VMD's distance-based bond guessing on the ~0.01 Å
+  spaced point cloud drew 15,173 spurious bonds on the phenol-dimer
+  example (vs the 2,477 real ones; VMD logged "Excessive bonding
+  errors"). Renders now show exactly the paths Multiwfn computed.
+- New pre-export guard: nuclear CPs must match the exported structure
+  (atom count + ≤0.5 Å nearest-atom distance) — a session molecule
+  different from the analyzed one no longer renders a floating QTAIM
+  network (owner report: 32-atom molecule + 26-atom QTAIM).
+- README/example: QTAIM gallery image updated to a verified aligned
+  render (phenol dimer, Tachyon).
+
+# Changelog
+
 ## 2026.11.19
 
 ### Analysis Type presets

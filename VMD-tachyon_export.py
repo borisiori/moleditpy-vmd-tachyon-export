@@ -1545,6 +1545,42 @@ def _labels_tcl(settings, natoms):
     return lines
 
 
+def _nuclear_cp_positions(cps_path):
+    """Nuclear critical-point coordinates from CPs.pdb (name C)."""
+    import numpy as np
+    rows = []
+    try:
+        for line in Path(cps_path).read_text(encoding="utf-8").splitlines():
+            if line.startswith("HETATM") and line[12:16].strip() == "C":
+                rows.append([float(line[30:38]), float(line[38:46]),
+                             float(line[46:54])])
+    except (OSError, ValueError):
+        return None
+    return np.array(rows) if rows else None
+
+def _write_paths_with_conect(src, dest):
+    """Copy paths.pdb adding CONECT records that chain each
+    TER-separated gradient path (see _qtaim_tcl: autobonds 0)."""
+    lines = Path(src).read_text(encoding="utf-8").splitlines()
+    out, conect, prev = [], [], None
+    for line in lines:
+        if line.startswith("TER"):
+            out.append(line)
+            prev = None
+        elif line.startswith(("HETATM", "ATOM")):
+            out.append(line)
+            serial = int(line[6:11])
+            if prev is not None:
+                conect.append((prev, serial))
+            prev = serial
+        else:
+            out.append(line)
+    for a, b in conect:
+        out.append(f"CONECT{a:5d}{b:5d}")
+    out.append("END")
+    Path(dest).write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
 def _qtaim_tcl(settings):
     """QTAIM scene: molecule + colored critical points + bond paths.
 
@@ -1586,7 +1622,9 @@ def _qtaim_tcl(settings):
     lines.append("mol addrep top")
 
     # Paths molecule: gray lines
-    lines.append(f"mol new {paths} type pdb waitfor all")
+    lines.append(f"mol new {paths} type pdb waitfor all autobonds 0")
+    # explicit CONECT (staged copy) — distance-based bond guessing
+    # on the ~0.01 A-spaced point cloud drew 15,173 spurious bonds
     lines.append("mol delrep 0 top")
     lines.append("mol representation Lines")
     lines.append("mol color ColorID 2")
@@ -2589,12 +2627,41 @@ def prepare_project(context, settings, installation, log):
     )
 
     # QTAIM files: copy into the project for portability
+    # consistency guard: nuclear CPs must sit on THIS structure — a
+    # session molecule different from the analyzed one renders the
+    # QTAIM network floating over the wrong CPK (owner report:
+    # 32-atom molecule + 26-atom phenol-dimer QTAIM)
+    cps_guard = settings.get("qtaim_cps_path", "")
+    if cps_guard and Path(cps_guard).is_file():
+        nuclear = _nuclear_cp_positions(cps_guard)
+        if nuclear is not None and len(nuclear) and len(positions):
+            if len(nuclear) != len(positions):
+                raise ValueError(
+                    f"QTAIM data belongs to a different molecule: "
+                    f"{len(nuclear)} nuclear critical points vs "
+                    f"{len(positions)} atoms in the exported structure. "
+                    "Load the analyzed structure (or set it as the "
+                    "external geometry) before exporting QTAIM.")
+            import numpy as np
+            pos = np.asarray(positions, dtype=float)
+            spread = nuclear[:, None, :] - pos[None, :, :]
+            dist = np.linalg.norm(spread, axis=2).min(axis=1)
+            if float(dist.max()) > 0.5:
+                raise ValueError(
+                    "QTAIM nuclear critical points sit further than "
+                    f"0.5 A from the exported structure (max "
+                    f"{float(dist.max()):.2f} A) — the QTAIM data and "
+                    "the molecule do not match.")
     for key, field in (("qtaim_cps_path", "CPs.pdb"),
                        ("qtaim_paths_path", "paths.pdb")):
         src = settings.get(key, "")
         if src and Path(src).is_file():
             dest = project / "geometry" / Path(src).name
-            if not dest.is_file():
+            if key == "qtaim_paths_path":
+                # CONECT-augmented copy so VMD (autobonds off) draws
+                # exactly the paths Multiwfn computed
+                _write_paths_with_conect(src, dest)
+            elif not dest.is_file():
                 shutil.copy2(src, dest)
             settings[key] = str(dest)  # use the project-relative copy
 
