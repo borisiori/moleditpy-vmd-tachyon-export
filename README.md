@@ -115,7 +115,7 @@ below opens at full resolution when clicked.
 | Methyl radical | Spin density | [![Spin](examples/03_spin_elf/methyl_radical/render_spin.png)](examples/03_spin_elf/methyl_radical/render_spin.png) |
 | Water | ELF | [![ELF](examples/03_spin_elf/water_elf/render_elf.png)](examples/03_spin_elf/water_elf/render_elf.png) |
 | Phenol dimer | NCI | [![NCI](assets/examples/nci_phenol_dimer.png)](assets/examples/nci_phenol_dimer.png) |
-| Phenol dimer | QTAIM | [![QTAIM](assets/examples/example_qtaim.png)](assets/examples/example_qtaim.png) |
+| Phenol dimer | QTAIM | [![QTAIM](assets/examples/example_qtaim_v2.png)](assets/examples/example_qtaim_v2.png) |
 | Phenol | Dual Descriptor | [![DD](assets/examples/example_dd.png)](assets/examples/example_dd.png) |
 
 Step-by-step guides for the ORCA/Multiwfn examples live in
